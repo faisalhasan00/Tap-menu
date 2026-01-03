@@ -3,8 +3,8 @@
  * Centralized file for all API endpoints and frontend routes
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-const FRONTEND_BASE_URL = process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.tapmenu.in/api';
+const FRONTEND_BASE_URL = process.env.NEXT_PUBLIC_FRONTEND_URL || 'https://www.tapmenu.in/';
 
 // API Routes
 export const apiRoutes = {
