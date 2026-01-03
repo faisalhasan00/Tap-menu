@@ -21,15 +21,18 @@ export interface CreateRestaurantData {
 }
 
 class RestaurantService {
-  private getAuthHeaders(): HeadersInit {
+  // ✅ FIXED: Return type is now Record<string, string>
+  private getAuthHeaders(): Record<string, string> {
     const token = localStorage.getItem('token');
+
     console.log('🔐 [FRONTEND] Getting auth headers:', {
       hasToken: !!token,
-      tokenLength: token?.length || 0
+      tokenLength: token?.length || 0,
     });
+
     return {
       'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
   }
 
@@ -47,20 +50,23 @@ class RestaurantService {
     return response.json();
   }
 
-  async createRestaurant(data: CreateRestaurantData): Promise<{ success: boolean; data: Restaurant }> {
+  async createRestaurant(
+    data: CreateRestaurantData
+  ): Promise<{ success: boolean; data: Restaurant }> {
     console.log('🍽️ [FRONTEND] Creating restaurant:', data);
     console.log('🍽️ [FRONTEND] API URL:', apiRoutes.restaurants.create);
-    
+
     const headers = this.getAuthHeaders();
+
     console.log('🍽️ [FRONTEND] Request headers:', {
       hasContentType: !!headers['Content-Type'],
       hasAuthorization: !!headers['Authorization'],
-      authHeaderPrefix: headers['Authorization']?.substring(0, 20) + '...'
+      authHeaderPrefix: headers['Authorization']?.substring(0, 20) + '...',
     });
 
     const response = await fetch(apiRoutes.restaurants.create, {
       method: 'POST',
-      headers: headers,
+      headers,
       body: JSON.stringify(data),
     });
 
@@ -105,7 +111,10 @@ class RestaurantService {
     return response.json();
   }
 
-  async createOwner(restaurantId: string, data: { username: string; password: string }): Promise<{ success: boolean; data: any }> {
+  async createOwner(
+    restaurantId: string,
+    data: { username: string; password: string }
+  ): Promise<{ success: boolean; data: any }> {
     const response = await fetch(apiRoutes.restaurants.createOwner(restaurantId), {
       method: 'POST',
       headers: this.getAuthHeaders(),
@@ -134,7 +143,10 @@ class RestaurantService {
     return response.json();
   }
 
-  async getQRCode(): Promise<{ success: boolean; data: { qrCodeUrl: string; menuUrl: string; restaurant: Restaurant } }> {
+  async getQRCode(): Promise<{
+    success: boolean;
+    data: { qrCodeUrl: string; menuUrl: string; restaurant: Restaurant };
+  }> {
     const response = await fetch(apiRoutes.restaurants.getQRCode, {
       method: 'GET',
       headers: this.getAuthHeaders(),
@@ -150,4 +162,3 @@ class RestaurantService {
 }
 
 export const restaurantService = new RestaurantService();
-
