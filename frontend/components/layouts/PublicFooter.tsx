@@ -69,12 +69,12 @@ export default function PublicFooter() {
               </li>
               <li>
                 <a
-                  href="https://wa.me/91XXXXXXXXXX"
+                  href="https://wa.me/918332063638"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm hover:text-[#22C55E] transition-colors duration-200"
                 >
-                  +91-XXXXXXXXXX
+                  +91-8332063638
                 </a>
               </li>
             </ul>
@@ -86,6 +86,10 @@ export default function PublicFooter() {
           <p className="text-sm text-center text-[#CBD5E1]">
             © {currentYear} D-Menu. All rights reserved.
           </p>
+          <p className="text-sm text-center text-[#CBD5E1]">
+  Crafted by Fynexon Technologies
+</p>
+
         </div>
       </div>
     </footer>
