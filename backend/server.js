@@ -9,12 +9,37 @@ const seedSuperAdmin = require('./src/utils/seedSuperAdmin');
 const app = express();
 
 // CORS configuration
+// const corsOptions = {
+//   origin: process.env.FRONTEND_URL || process.env.CORS_ORIGIN || '*',
+//   credentials: true,
+//   optionsSuccessStatus: 200
+// };
+// app.use(cors(corsOptions));
+
+
+// ✅ CORS configuration (PRODUCTION SAFE)
+const allowedOrigins = [
+  'https://tapmenu.in',
+  'https://www.tapmenu.in'
+];
+
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || process.env.CORS_ORIGIN || '*',
+  origin: function (origin, callback) {
+    // allow requests with no origin (Postman, curl, server-to-server)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS blocked for origin: ${origin}`));
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200
 };
+
 app.use(cors(corsOptions));
+
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
