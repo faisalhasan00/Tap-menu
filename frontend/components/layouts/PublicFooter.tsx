@@ -84,7 +84,7 @@ export default function PublicFooter() {
         {/* Bottom Bar */}
         <div className="border-t border-gray-700 pt-8">
           <p className="text-sm text-center text-[#CBD5E1]">
-            © {currentYear} D-Menu. All rights reserved.
+            © {currentYear} TapMenu. All rights reserved.
           </p>
           <p className="text-sm text-center text-[#CBD5E1]">
   Crafted by Fynexon Technologies
