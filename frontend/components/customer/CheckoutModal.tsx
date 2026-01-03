@@ -1,0 +1,206 @@
+'use client';
+
+import { useState } from 'react';
+import { useCart } from '@/contexts/CartContext';
+import { orderService } from '@/services/orderService';
+import Button from '@/components/ui/Button';
+
+interface CheckoutModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  restaurantId: string;
+  restaurantName: string;
+  tableNumber: number;
+}
+
+const CheckoutModal: React.FC<CheckoutModalProps> = ({
+  isOpen,
+  onClose,
+  restaurantId,
+  restaurantName,
+  tableNumber,
+}) => {
+  const { items, totalPrice, clearCart } = useCart();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string>('');
+  const [orderSuccess, setOrderSuccess] = useState(false);
+  const [orderNumber, setOrderNumber] = useState<string>('');
+
+  const handleCheckout = async () => {
+    if (items.length === 0) {
+      setError('Your cart is empty');
+      return;
+    }
+
+    setIsProcessing(true);
+    setError('');
+
+    try {
+      console.log('🛒 [CHECKOUT] Creating order:', {
+        restaurantId,
+        tableNumber,
+        itemsCount: items.length
+      });
+
+      const orderData = {
+        restaurantId,
+        tableNumber,
+        items: items.map((item) => ({
+          menuItemId: item._id,
+          quantity: item.quantity,
+        })),
+      };
+
+      console.log('📦 [CHECKOUT] Order data prepared:', {
+        ...orderData,
+        items: orderData.items.map(i => ({ menuItemId: i.menuItemId, quantity: i.quantity }))
+      });
+
+      const response = await orderService.createOrder(orderData);
+      
+      console.log('✅ [CHECKOUT] Order created successfully:', response.data._id);
+
+      setOrderNumber(response.data._id);
+      setOrderSuccess(true);
+      clearCart();
+      
+      // Auto-close after 3 seconds
+      setTimeout(() => {
+        setOrderSuccess(false);
+        onClose();
+      }, 3000);
+    } catch (err: any) {
+      console.error('❌ [CHECKOUT] Order creation failed:', err);
+      setError(err.message || 'Failed to place order. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleClose = () => {
+    if (!isProcessing) {
+      setError('');
+      setOrderSuccess(false);
+      onClose();
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-hidden flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+          <h2 className="text-xl font-bold text-gray-900">
+            {orderSuccess ? 'Order Placed!' : 'Checkout'}
+          </h2>
+          {!isProcessing && (
+            <button
+              onClick={handleClose}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-4">
+          {orderSuccess ? (
+            <div className="text-center py-8">
+              <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h3>
+              <p className="text-gray-600 mb-4">
+                Your order has been sent to {restaurantName}
+              </p>
+              <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                <p className="text-sm text-gray-600">Table Number</p>
+                <p className="text-2xl font-bold text-gray-900">Table {tableNumber}</p>
+                <p className="text-sm text-gray-500 mt-2">Order ID: {orderNumber.substring(0, 8)}...</p>
+              </div>
+              <p className="text-sm text-gray-500">
+                The restaurant will prepare your order shortly.
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Order Summary */}
+              <div className="mb-4">
+                <h3 className="font-semibold text-gray-900 mb-2">Order Summary</h3>
+                <div className="bg-gray-50 rounded-lg p-3 mb-3">
+                  <p className="text-sm text-gray-600">Restaurant</p>
+                  <p className="font-medium text-gray-900">{restaurantName}</p>
+                  <p className="text-sm text-gray-600 mt-1">Table Number</p>
+                  <p className="font-medium text-gray-900">Table {tableNumber}</p>
+                </div>
+
+                <div className="space-y-2">
+                  {items.map((item) => (
+                    <div key={item._id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">{item.name}</p>
+                        <p className="text-sm text-gray-600">
+                          ${item.price.toFixed(2)} × {item.quantity}
+                        </p>
+                      </div>
+                      <p className="font-semibold text-gray-900">
+                        ${(item.price * item.quantity).toFixed(2)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Error Message */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+                  {error}
+                </div>
+              )}
+
+              {/* Total */}
+              <div className="border-t border-gray-200 pt-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-semibold text-gray-900">Total:</span>
+                  <span className="text-xl font-bold text-[#22C55E]">${totalPrice.toFixed(2)}</span>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Footer */}
+        {!orderSuccess && (
+          <div className="border-t border-gray-200 p-4">
+            <Button
+              onClick={handleCheckout}
+              isLoading={isProcessing}
+              disabled={isProcessing || items.length === 0}
+              className="w-full"
+              variant="primary"
+            >
+              {isProcessing ? 'Placing Order...' : 'Place Order'}
+            </Button>
+            <button
+              onClick={handleClose}
+              disabled={isProcessing}
+              className="w-full mt-2 py-2 px-4 text-gray-600 hover:bg-gray-50 rounded-lg font-medium transition-colors disabled:opacity-50"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default CheckoutModal;
+
