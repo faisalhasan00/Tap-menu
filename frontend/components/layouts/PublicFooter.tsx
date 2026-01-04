@@ -10,7 +10,7 @@ export default function PublicFooter() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           {/* Left Section - Brand */}
           <div>
-            <h3 className="text-2xl font-bold text-white mb-3">D-Menu</h3>
+            <h3 className="text-2xl font-bold text-white mb-3">TapMenu</h3>
             <p className="text-sm leading-relaxed">
               Simple QR ordering system for restaurants.
             </p>
@@ -64,7 +64,7 @@ export default function PublicFooter() {
                   href="mailto:support@dmenu.in"
                   className="text-sm hover:text-[#22C55E] transition-colors duration-200"
                 >
-                  support@dmenu.in
+                  tapmenu97@gmail.com
                 </a>
               </li>
               <li>
@@ -87,8 +87,8 @@ export default function PublicFooter() {
             © {currentYear} TapMenu. All rights reserved.
           </p>
           <p className="text-sm text-center text-[#CBD5E1]">
-  Crafted by Fynexon Technologies
-</p>
+            Crafted by Fynexon Technologies
+          </p>
 
         </div>
       </div>

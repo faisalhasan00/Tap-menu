@@ -105,7 +105,7 @@ const RestaurantOwnerLayout: React.FC<RestaurantOwnerLayoutProps> = ({
           {/* Logo */}
           <div className="h-16 flex items-center justify-center border-b border-gray-700 px-4">
             <h1 className={`font-bold text-xl ${isSidebarOpen ? 'block' : 'hidden'}`}>
-              D-Menu
+              TapMenu
             </h1>
             <h1 className={`font-bold text-xl ${isSidebarOpen ? 'hidden' : 'block'}`}>
               DM
