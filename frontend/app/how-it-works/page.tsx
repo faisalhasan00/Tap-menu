@@ -7,7 +7,7 @@ export default function HowItWorks() {
             How It Works
           </h1>
           <p className="text-xl text-gray-600">
-            Learn how D-Menu works
+            Learn how TapMenu works
           </p>
         </div>
       </div>

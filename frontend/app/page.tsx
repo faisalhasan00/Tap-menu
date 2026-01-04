@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'QR Menu Restaurant Ordering System | D-Menu',
+  title: 'QR Menu Restaurant Ordering System | TapMenu',
   description: 'One QR code per restaurant. Customers scan, select table, and order. Track sales analytics. Simple QR menu system for restaurants in India.',
   keywords: [
     'QR menu',
@@ -18,24 +18,24 @@ export const metadata: Metadata = {
     'dhaba menu system'
   ].join(', '),
   openGraph: {
-    title: 'QR Menu Restaurant Ordering System | D-Menu',
+    title: 'QR Menu Restaurant Ordering System | TapMenu',
     description: 'One QR code per restaurant. Customers scan, select table, and order. Track sales analytics. Simple QR menu system for restaurants in India.',
     type: 'website',
-    url: 'https://dmenu.in', // Placeholder URL
-    siteName: 'D-Menu',
+    url: 'https://tapmenu.in', // Placeholder URL
+    siteName: 'TapMenu',
     images: [
       {
         url: 'https://dmenu.in/og-image.jpg', // Placeholder image URL
         width: 1200,
         height: 630,
-        alt: 'D-Menu - QR Menu Restaurant Ordering System',
+        alt: 'TapMenu - QR Menu Restaurant Ordering System',
       },
     ],
     locale: 'en_IN',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'QR Menu Restaurant Ordering System | D-Menu',
+    title: 'QR Menu Restaurant Ordering System | TapMenu',
     description: 'One QR code per restaurant. Customers scan, select table, and order. Track sales analytics.',
     images: ['https://dmenu.in/og-image.jpg'], // Placeholder image URL
   },
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: 'https://dmenu.in', // Placeholder URL
+    canonical: 'https://tapmenu.in', // Placeholder URL
   },
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || 'YOUR_GOOGLE_VERIFICATION_CODE', // Placeholder - add to .env.local
@@ -216,7 +216,7 @@ export default function Home() {
                             />
                           </svg>
                         </div>
-                        <p className="text-[10px] sm:text-xs text-gray-500 font-medium">D-Menu App</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500 font-medium">TapMenu</p>
                       </div>
                     </div>
                   </div>
@@ -522,13 +522,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Why D-Menu Section */}
-      <section id="why-d-menu" className="bg-white py-20">
+      {/* Why TapMenu Section */}
+      <section id="why-TapMenu" className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section Heading */}
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-[#0F172A] mb-4">
-              Why D-Menu
+              Why TapMenu
             </h2>
             <p className="text-lg text-gray-600">
               Built for small restaurants who want simple, reliable solutions
@@ -667,7 +667,7 @@ export default function Home() {
             Ready to Simplify Your Restaurant Orders?
           </h2>
           <p className="text-xl text-gray-300 mb-10">
-            Set up D-Menu in minutes and start taking orders with just one QR code.
+            Set up TapMenu in minutes and start taking orders with just one QR code.
           </p>
           
           {/* CTA Buttons */}
