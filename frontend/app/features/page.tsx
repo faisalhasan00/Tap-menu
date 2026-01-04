@@ -7,7 +7,7 @@ export default function Features() {
             Features
           </h1>
           <p className="text-xl text-gray-600">
-            Discover what D-Menu has to offer
+            Discover what TapMenu has to offer
           </p>
         </div>
       </div>

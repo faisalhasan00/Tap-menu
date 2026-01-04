@@ -61,7 +61,7 @@ export default function RestaurantOwnerLogin() {
     <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">D-Menu</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">TapMenu</h1>
           <p className="text-gray-600">Restaurant Owner Login</p>
         </div>
 
