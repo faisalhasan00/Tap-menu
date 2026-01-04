@@ -137,9 +137,9 @@ export default function Contact() {
   };
 
   // Get contact info from environment or use defaults
-  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'support@dmenu.in';
-  const contactPhone = process.env.NEXT_PUBLIC_CONTACT_PHONE || '+91-XXXXXXXXXX';
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '91XXXXXXXXXX';
+  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'tapmenu97@gmail.com';
+  const contactPhone = process.env.NEXT_PUBLIC_CONTACT_PHONE || '+91-8332053638';
+  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '91-8332053638';
 
   return (
     <div className="min-h-screen bg-white">
