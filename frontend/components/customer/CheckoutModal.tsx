@@ -29,6 +29,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [orderNumber, setOrderNumber] = useState<string>('');
   const [trackingId, setTrackingId] = useState<string>('');
+  const [copied, setCopied] = useState(false);
 
   const handleCheckout = async () => {
     if (items.length === 0) {
@@ -80,7 +81,28 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     if (!isProcessing) {
       setError('');
       setOrderSuccess(false);
+      setCopied(false);
       onClose();
+    }
+  };
+
+  const handleCopyTrackingId = async () => {
+    if (!trackingId) return;
+
+    try {
+      await navigator.clipboard.writeText(trackingId);
+      setCopied(true);
+      
+      // Redirect to track order page after a short delay
+      setTimeout(() => {
+        onClose();
+        router.push(`${frontendRoutes.customer.trackOrder}?id=${trackingId}`);
+      }, 1000);
+    } catch (err) {
+      console.error('Failed to copy tracking ID:', err);
+      // Fallback: redirect even if copy fails
+      onClose();
+      router.push(`${frontendRoutes.customer.trackOrder}?id=${trackingId}`);
     }
   };
 
@@ -124,22 +146,44 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <p className="text-2xl font-bold text-gray-900">Table {tableNumber}</p>
                 {trackingId && (
                   <div className="mt-3 pt-3 border-t border-gray-200">
-                    <p className="text-sm text-gray-600 mb-1">Tracking ID</p>
-                    <p className="text-xl font-bold text-[#22C55E]">{trackingId}</p>
+                    <p className="text-sm text-gray-600 mb-2">Tracking ID</p>
+                    <div className="flex items-center justify-center gap-2 bg-white rounded-lg p-3 border border-gray-200">
+                      <p className="text-xl font-bold text-[#22C55E]">{trackingId}</p>
+                      <button
+                        onClick={handleCopyTrackingId}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-[#22C55E] text-white rounded-lg hover:bg-[#16A34A] transition-colors text-sm font-medium"
+                        title="Copy tracking ID"
+                      >
+                        {copied ? (
+                          <>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                            <span>Copy</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    {copied && (
+                      <p className="text-xs text-green-600 mt-2 text-center">
+                        Tracking ID copied! Redirecting to track page...
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
-              {trackingId && (
+              {trackingId && !copied && (
                 <div className="mb-4">
-                  <button
-                    onClick={() => {
-                      onClose();
-                      router.push(`${frontendRoutes.customer.trackOrder}?id=${trackingId}`);
-                    }}
-                    className="text-[#22C55E] hover:text-[#16A34A] font-semibold underline text-sm"
-                  >
-                    Click here to track order
-                  </button>
+                  <p className="text-sm text-gray-600 mb-2">
+                    Click the copy button above to copy your tracking ID and track your order.
+                  </p>
                 </div>
               )}
               <p className="text-sm text-gray-500">
