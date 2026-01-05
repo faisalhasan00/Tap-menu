@@ -87,7 +87,9 @@ class OrderService {
     }
 
     const result = await response.json();
-    console.log('✅ [ORDER_SERVICE] Order created:', result.data._id);
+    console.log('✅ [ORDER_SERVICE] Order created:', result);
+    console.log('✅ [ORDER_SERVICE] Full order data:', result.data);
+    console.log('✅ [ORDER_SERVICE] Tracking ID from response:', result.data?.trackingId);
     return result;
   }
 

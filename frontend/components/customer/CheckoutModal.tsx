@@ -63,15 +63,23 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
       const response = await orderService.createOrder(orderData);
       
-      console.log('✅ [CHECKOUT] Order created successfully:', response.data._id);
+      console.log('✅ [CHECKOUT] Order created successfully:', response);
+      console.log('✅ [CHECKOUT] Order data:', response.data);
+      console.log('✅ [CHECKOUT] Tracking ID:', response.data?.trackingId);
 
       setOrderNumber(response.data._id);
-      setTrackingId(response.data.trackingId || '');
+      setTrackingId(response.data?.trackingId || '');
       setOrderSuccess(true);
       clearCart();
     } catch (err: any) {
       console.error('❌ [CHECKOUT] Order creation failed:', err);
+      console.error('❌ [CHECKOUT] Error details:', {
+        message: err.message,
+        stack: err.stack,
+        error: err
+      });
       setError(err.message || 'Failed to place order. Please try again.');
+      setOrderSuccess(false);
     } finally {
       setIsProcessing(false);
     }
@@ -108,9 +116,18 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   if (!isOpen) return null;
 
+  console.log('🔍 [CHECKOUT_MODAL] Render state:', {
+    isOpen,
+    orderSuccess,
+    trackingId,
+    orderNumber,
+    error,
+    isProcessing
+  });
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-hidden flex flex-col z-[10000]">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-900">
@@ -144,7 +161,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
               <div className="bg-gray-50 rounded-lg p-4 mb-4">
                 <p className="text-sm text-gray-600">Table Number</p>
                 <p className="text-2xl font-bold text-gray-900">Table {tableNumber}</p>
-                {trackingId && (
+                {trackingId ? (
                   <div className="mt-3 pt-3 border-t border-gray-200">
                     <p className="text-sm text-gray-600 mb-2">Tracking ID</p>
                     <div className="flex items-center justify-center gap-2 bg-white rounded-lg p-3 border border-gray-200">
@@ -177,12 +194,23 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       </p>
                     )}
                   </div>
+                ) : (
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <p className="text-sm text-gray-500">Order ID: {orderNumber.substring(0, 8)}...</p>
+                  </div>
                 )}
               </div>
               {trackingId && !copied && (
                 <div className="mb-4">
                   <p className="text-sm text-gray-600 mb-2">
                     Click the copy button above to copy your tracking ID and track your order.
+                  </p>
+                </div>
+              )}
+              {!trackingId && (
+                <div className="mb-4">
+                  <p className="text-sm text-gray-600 mb-2">
+                    Your order has been placed successfully. The restaurant will prepare your order shortly.
                   </p>
                 </div>
               )}
