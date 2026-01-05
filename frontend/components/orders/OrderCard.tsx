@@ -117,7 +117,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, isNew = false, onStatusUpd
                 {item.quantity}x {item.name}
               </p>
             </div>
-            <p className="text-sm text-gray-600">${(item.price * item.quantity).toFixed(2)}</p>
+            <p className="text-sm text-gray-600">₹{(item.price * item.quantity).toFixed(2)}</p>
           </div>
         ))}
       </div>
@@ -126,7 +126,7 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, isNew = false, onStatusUpd
       <div className="flex items-center justify-between pt-4 border-t border-gray-200">
         <div>
           <p className="text-xs text-gray-500">Total Amount</p>
-          <p className="text-xl font-bold text-[#22C55E]">${order.totalAmount.toFixed(2)}</p>
+          <p className="text-xl font-bold text-[#22C55E]">₹{order.totalAmount.toFixed(2)}</p>
         </div>
         <div className="flex items-center gap-2">
           {getStatusActions()}

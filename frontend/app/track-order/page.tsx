@@ -200,11 +200,11 @@ function TrackOrderContent() {
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">{item.name}</p>
                         <p className="text-sm text-gray-600">
-                          ${item.price.toFixed(2)} × {item.quantity}
+                          ₹{item.price.toFixed(2)} × {item.quantity}
                         </p>
                       </div>
                       <p className="font-semibold text-gray-900">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        ₹{(item.price * item.quantity).toFixed(2)}
                       </p>
                     </div>
                   ))}
@@ -216,7 +216,7 @@ function TrackOrderContent() {
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold text-gray-900">Total Amount</span>
                   <span className="text-2xl font-bold text-[#22C55E]">
-                    ${order.totalAmount.toFixed(2)}
+                    ₹{order.totalAmount.toFixed(2)}
                   </span>
                 </div>
               </div>

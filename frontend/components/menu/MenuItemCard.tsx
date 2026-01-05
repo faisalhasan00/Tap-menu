@@ -70,7 +70,7 @@ const MenuItemCard: React.FC<MenuItemCardProps> = ({ item, onToggle }) => {
 
         <div className="flex items-center justify-between mt-4">
           <div>
-            <span className="text-2xl font-bold text-gray-900">${item.price.toFixed(2)}</span>
+            <span className="text-2xl font-bold text-gray-900">₹{item.price.toFixed(2)}</span>
           </div>
 
           {/* Toggle Switch */}
