@@ -238,7 +238,6 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 The restaurant will prepare your order shortly.
               </p>
             </div>
-            )
           ) : (
             <>
               {/* Order Summary */}
