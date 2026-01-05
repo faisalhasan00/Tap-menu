@@ -85,10 +85,26 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         throw new Error('Invalid response from server');
       }
 
-      setOrderNumber(response.data._id || '');
-      setTrackingId(response.data?.trackingId || response.data?.trackingId || '');
+      const orderId = response.data._id || '';
+      const trackId = response.data?.trackingId || '';
+      
+      console.log('✅ [CHECKOUT] Setting state:', { orderId, trackId });
+      
+      // Set all states together - React batches these
+      setOrderNumber(orderId);
+      setTrackingId(trackId);
+      
+      // Force immediate state update and re-render
       setOrderSuccess(true);
+      
+      // Double-check state is set
+      setTimeout(() => {
+        console.log('✅ [CHECKOUT] State check after timeout:', { orderSuccess: true, trackingId: trackId });
+      }, 100);
+      
       clearCart();
+      
+      console.log('✅ [CHECKOUT] All states set, component should re-render');
       
       console.log('✅ [CHECKOUT] State updated - orderSuccess:', true, 'trackingId:', response.data?.trackingId);
     } catch (err: any) {
@@ -136,13 +152,21 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   if (!isOpen) return null;
 
+  // Force re-render when orderSuccess changes
+  useEffect(() => {
+    if (orderSuccess) {
+      console.log('🎉 [CHECKOUT_MODAL] Order success detected, forcing render');
+    }
+  }, [orderSuccess]);
+
   console.log('🔍 [CHECKOUT_MODAL] Render state:', {
     isOpen,
     orderSuccess,
     trackingId,
     orderNumber,
     error,
-    isProcessing
+    isProcessing,
+    shouldShowSuccess: orderSuccess && isOpen
   });
 
   return (
@@ -168,7 +192,16 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4">
           {orderSuccess ? (
-            <div className="text-center py-8">
+            <div className="text-center py-8" key="success-screen" style={{ display: 'block' }}>
+              {(() => {
+                console.log('🎨 [CHECKOUT_MODAL] Rendering SUCCESS screen!', { 
+                  trackingId, 
+                  orderNumber, 
+                  orderSuccess,
+                  timestamp: new Date().toISOString()
+                });
+                return null;
+              })()}
               <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
                 <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
