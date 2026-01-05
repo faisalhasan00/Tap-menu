@@ -42,6 +42,13 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     });
   }, [orderSuccess, trackingId, orderNumber, error, isProcessing]);
 
+  // Force re-render when orderSuccess changes
+  useEffect(() => {
+    if (orderSuccess) {
+      console.log('🎉 [CHECKOUT_MODAL] Order success detected, forcing render');
+    }
+  }, [orderSuccess]);
+
   const handleCheckout = async () => {
     if (items.length === 0) {
       setError('Your cart is empty');
@@ -149,15 +156,6 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       router.push(`${frontendRoutes.customer.trackOrder}?id=${trackingId}`);
     }
   };
-
-  if (!isOpen) return null;
-
-  // Force re-render when orderSuccess changes
-  useEffect(() => {
-    if (orderSuccess) {
-      console.log('🎉 [CHECKOUT_MODAL] Order success detected, forcing render');
-    }
-  }, [orderSuccess]);
 
   console.log('🔍 [CHECKOUT_MODAL] Render state:', {
     isOpen,
