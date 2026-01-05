@@ -111,22 +111,29 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         quantity: item.quantity
       }));
       
-      // Set all states together - React will batch these and re-render once
+      // Set all states - React batches these
       setOrderNumber(orderId);
       setTrackingId(trackId);
       setOrderItems(receiptItems);
       setOrderTotal(response.data.totalAmount || totalPrice);
       setOrderDate(response.data.createdAt || new Date().toISOString());
-      setOrderSuccess(true);
+      
+      // Force a re-render by setting orderSuccess after a microtask
+      // This ensures all other states are set first
+      Promise.resolve().then(() => {
+        setOrderSuccess(true);
+        setIsProcessing(false);
+        setRenderKey(prev => prev + 1); // Force re-render
+        console.log('✅ [CHECKOUT] orderSuccess set to true - component should re-render now');
+      });
       
       clearCart();
       
-      console.log('✅ [CHECKOUT] All states set synchronously:', {
+      console.log('✅ [CHECKOUT] States initialized:', {
         orderId,
         trackId,
         receiptItemsCount: receiptItems.length,
-        orderTotal: response.data.totalAmount || totalPrice,
-        orderSuccess: true
+        orderTotal: response.data.totalAmount || totalPrice
       });
     } catch (err: any) {
       console.error('❌ [CHECKOUT] Order creation failed:', err);
@@ -137,9 +144,9 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       });
       setError(err.message || 'Failed to place order. Please try again.');
       setOrderSuccess(false);
-    } finally {
       setIsProcessing(false);
     }
+    // Note: isProcessing is set to false in the Promise.resolve().then() callback after orderSuccess is set
   };
 
   const handleClose = () => {
@@ -180,24 +187,30 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setOrderNumber('');
       setOrderItems([]);
       setCopied(false);
+      setRenderKey(0);
     }
   }, [isOpen]);
 
-  console.log('🔍 [CHECKOUT_MODAL] Render state:', {
-    isOpen,
-    orderSuccess,
-    trackingId,
-    orderNumber,
-    error,
-    isProcessing,
-    shouldShowSuccess: orderSuccess && isOpen
-  });
+  // Log render state
+  useEffect(() => {
+    if (isOpen) {
+      console.log('🔍 [CHECKOUT_MODAL] Render state:', {
+        isOpen,
+        orderSuccess,
+        trackingId,
+        orderNumber,
+        error,
+        isProcessing,
+        shouldShowSuccess: orderSuccess && isOpen && trackingId
+      });
+    }
+  }, [isOpen, orderSuccess, trackingId, orderNumber, error, isProcessing]);
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center p-4">
-      <div className={`bg-white rounded-lg shadow-xl ${orderSuccess ? 'max-w-2xl' : 'max-w-md'} w-full max-h-[90vh] overflow-hidden flex flex-col z-[10000]`}>
+      <div key={renderKey} className={`bg-white rounded-lg shadow-xl ${orderSuccess ? 'max-w-2xl' : 'max-w-md'} w-full max-h-[90vh] overflow-hidden flex flex-col z-[10000]`}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-900">
@@ -218,17 +231,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4">
           {orderSuccess && trackingId ? (
-            (() => {
-              console.log('🎨 [CHECKOUT_MODAL] Rendering SUCCESS screen!', {
-                orderSuccess,
-                trackingId,
-                orderItemsCount: orderItems.length,
-                orderNumber,
-                hasReceiptData: orderItems.length > 0
-              });
-              return null;
-            })() || (
-            <div className="space-y-4">
+            <div className="space-y-4" key={`success-${trackingId}`}>
               {/* Success Message */}
               <div className="text-center">
                 <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
@@ -269,7 +272,6 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 </button>
               </div>
             </div>
-            )
           ) : orderSuccess && !trackingId ? (
             <div className="text-center py-8">
               <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
