@@ -49,7 +49,7 @@ const CustomerMenuItemCard: React.FC<CustomerMenuItemCardProps> = ({ item }) => 
                 {item.vegType === 'VEG' ? '🟢 VEG' : '🔴 NON-VEG'}
               </span>
             </div>
-            <p className="text-lg font-bold text-gray-900">${item.price.toFixed(2)}</p>
+            <p className="text-lg font-bold text-gray-900">₹{item.price.toFixed(2)}</p>
           </div>
         </div>
       </div>
@@ -80,7 +80,7 @@ const CustomerMenuItemCard: React.FC<CustomerMenuItemCardProps> = ({ item }) => 
               {item.vegType === 'VEG' ? '🟢 VEG' : '🔴 NON-VEG'}
             </span>
           </div>
-          <p className="text-lg font-bold text-[#22C55E] mb-3">${item.price.toFixed(2)}</p>
+          <p className="text-lg font-bold text-[#22C55E] mb-3">₹{item.price.toFixed(2)}</p>
           <button
             onClick={handleAddToCart}
             className="w-full bg-[#22C55E] text-white py-2 px-4 rounded-lg font-medium hover:bg-[#16A34A] transition-colors active:scale-95"

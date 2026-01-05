@@ -54,6 +54,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   }, [orderSuccess]);
 
   const handleCheckout = async () => {
+    console.log('🛒 [CHECKOUT] handleCheckout called', { itemsCount: items.length, items });
+    
     if (items.length === 0) {
       setError('Your cart is empty');
       return;
@@ -61,6 +63,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
     setIsProcessing(true);
     setError('');
+    setOrderSuccess(false);
 
     try {
       console.log('🛒 [CHECKOUT] Creating order:', {
@@ -171,6 +174,18 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     }
   };
 
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setOrderSuccess(false);
+      setError('');
+      setTrackingId('');
+      setOrderNumber('');
+      setOrderItems([]);
+      setCopied(false);
+    }
+  }, [isOpen]);
+
   console.log('🔍 [CHECKOUT_MODAL] Render state:', {
     isOpen,
     orderSuccess,
@@ -180,6 +195,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     isProcessing,
     shouldShowSuccess: orderSuccess && isOpen
   });
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center p-4">
@@ -272,11 +289,11 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">{item.name}</p>
                         <p className="text-sm text-gray-600">
-                          ${item.price.toFixed(2)} × {item.quantity}
+                          ₹{item.price.toFixed(2)} × {item.quantity}
                         </p>
                       </div>
                       <p className="font-semibold text-gray-900">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        ₹{(item.price * item.quantity).toFixed(2)}
                       </p>
                     </div>
                   ))}
@@ -294,7 +311,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
               <div className="border-t border-gray-200 pt-4">
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold text-gray-900">Total:</span>
-                  <span className="text-xl font-bold text-[#22C55E]">${totalPrice.toFixed(2)}</span>
+                  <span className="text-xl font-bold text-[#22C55E]">₹{totalPrice.toFixed(2)}</span>
                 </div>
               </div>
             </>

@@ -37,7 +37,7 @@ const CartBar: React.FC<CartBarProps> = ({
             </svg>
             Cart ({totalItems})
           </span>
-          <span>${totalPrice.toFixed(2)}</span>
+          <span>₹{totalPrice.toFixed(2)}</span>
         </button>
       </div>
 
@@ -77,7 +77,7 @@ const CartBar: React.FC<CartBarProps> = ({
                       )}
                       <div className="flex-1 min-w-0">
                         <h3 className="font-medium text-gray-900 truncate">{item.name}</h3>
-                        <p className="text-sm text-gray-600">${item.price.toFixed(2)} each</p>
+                        <p className="text-sm text-gray-600">₹{item.price.toFixed(2)} each</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <button
@@ -117,7 +117,7 @@ const CartBar: React.FC<CartBarProps> = ({
               <div className="border-t border-gray-200 p-4 space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold text-gray-900">Total:</span>
-                  <span className="text-xl font-bold text-[#22C55E]">${totalPrice.toFixed(2)}</span>
+                  <span className="text-xl font-bold text-[#22C55E]">₹{totalPrice.toFixed(2)}</span>
                 </div>
                 <button
                   onClick={clearCart}
@@ -128,12 +128,17 @@ const CartBar: React.FC<CartBarProps> = ({
                 <button
                   className="w-full bg-[#22C55E] text-white py-3 px-4 rounded-lg font-semibold hover:bg-[#16A34A] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={() => {
+                    console.log('🛒 [CART_BAR] Proceed to Checkout clicked', { restaurantId, tableNumber });
                     if (!restaurantId || !tableNumber) {
                       alert('Restaurant or table information is missing. Please refresh the page.');
                       return;
                     }
                     setIsOpen(false);
-                    setShowCheckout(true);
+                    // Small delay to ensure cart modal closes before checkout opens
+                    setTimeout(() => {
+                      setShowCheckout(true);
+                      console.log('🛒 [CART_BAR] Checkout modal should open now');
+                    }, 100);
                   }}
                   disabled={!restaurantId || !tableNumber}
                 >
