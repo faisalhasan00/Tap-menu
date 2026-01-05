@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/contexts/CartContext';
 import { orderService } from '@/services/orderService';
@@ -30,6 +30,17 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [orderNumber, setOrderNumber] = useState<string>('');
   const [trackingId, setTrackingId] = useState<string>('');
   const [copied, setCopied] = useState(false);
+
+  // Debug: Log state changes
+  useEffect(() => {
+    console.log('🔍 [CHECKOUT_MODAL] State changed:', {
+      orderSuccess,
+      trackingId,
+      orderNumber,
+      error,
+      isProcessing
+    });
+  }, [orderSuccess, trackingId, orderNumber, error, isProcessing]);
 
   const handleCheckout = async () => {
     if (items.length === 0) {
@@ -64,13 +75,22 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       const response = await orderService.createOrder(orderData);
       
       console.log('✅ [CHECKOUT] Order created successfully:', response);
+      console.log('✅ [CHECKOUT] Full response:', JSON.stringify(response, null, 2));
       console.log('✅ [CHECKOUT] Order data:', response.data);
       console.log('✅ [CHECKOUT] Tracking ID:', response.data?.trackingId);
+      console.log('✅ [CHECKOUT] Order ID:', response.data?._id);
 
-      setOrderNumber(response.data._id);
-      setTrackingId(response.data?.trackingId || '');
+      // Ensure we have the order data
+      if (!response || !response.data) {
+        throw new Error('Invalid response from server');
+      }
+
+      setOrderNumber(response.data._id || '');
+      setTrackingId(response.data?.trackingId || response.data?.trackingId || '');
       setOrderSuccess(true);
       clearCart();
+      
+      console.log('✅ [CHECKOUT] State updated - orderSuccess:', true, 'trackingId:', response.data?.trackingId);
     } catch (err: any) {
       console.error('❌ [CHECKOUT] Order creation failed:', err);
       console.error('❌ [CHECKOUT] Error details:', {
@@ -218,6 +238,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 The restaurant will prepare your order shortly.
               </p>
             </div>
+            )
           ) : (
             <>
               {/* Order Summary */}

@@ -141,6 +141,9 @@ const createOrder = async (req, res) => {
       trackingId: trackingId
     });
 
+    // Convert Mongoose document to plain object to ensure all fields are included
+    const orderObject = order.toObject ? order.toObject() : order;
+    
     console.log('✅ [CREATE_ORDER] Order created successfully:', {
       orderId: order._id,
       trackingId: order.trackingId,
@@ -149,11 +152,17 @@ const createOrder = async (req, res) => {
       itemsCount: order.items.length,
       totalAmount: order.totalAmount
     });
+    
+    console.log('✅ [CREATE_ORDER] Order object to send:', {
+      _id: orderObject._id,
+      trackingId: orderObject.trackingId,
+      hasTrackingId: 'trackingId' in orderObject
+    });
 
     res.status(201).json({
       success: true,
       message: 'Order created successfully',
-      data: order
+      data: orderObject
     });
   } catch (error) {
     console.error('❌ [CREATE_ORDER] Error:', error);
