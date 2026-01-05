@@ -6,6 +6,7 @@ import { useCart } from '@/contexts/CartContext';
 import { orderService } from '@/services/orderService';
 import { frontendRoutes } from '@/config/routes';
 import Button from '@/components/ui/Button';
+import OrderReceipt from './OrderReceipt';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -30,6 +31,9 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [orderNumber, setOrderNumber] = useState<string>('');
   const [trackingId, setTrackingId] = useState<string>('');
   const [copied, setCopied] = useState(false);
+  const [orderItems, setOrderItems] = useState<Array<{ name: string; price: number; quantity: number }>>([]);
+  const [orderTotal, setOrderTotal] = useState<number>(0);
+  const [orderDate, setOrderDate] = useState<string>('');
 
   // Debug: Log state changes
   useEffect(() => {
@@ -97,9 +101,19 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       
       console.log('✅ [CHECKOUT] Setting state:', { orderId, trackId });
       
+      // Store order items and details for receipt
+      const receiptItems = response.data.items.map((item: any) => ({
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity
+      }));
+      
       // Set all states together - React batches these
       setOrderNumber(orderId);
       setTrackingId(trackId);
+      setOrderItems(receiptItems);
+      setOrderTotal(response.data.totalAmount || totalPrice);
+      setOrderDate(response.data.createdAt || new Date().toISOString());
       
       // Force immediate state update and re-render
       setOrderSuccess(true);
@@ -169,7 +183,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-hidden flex flex-col z-[10000]">
+      <div className={`bg-white rounded-lg shadow-xl ${orderSuccess ? 'max-w-2xl' : 'max-w-md'} w-full max-h-[90vh] overflow-hidden flex flex-col z-[10000]`}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-900">
@@ -189,17 +203,44 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4">
-          {orderSuccess ? (
-            <div className="text-center py-8" key="success-screen" style={{ display: 'block' }}>
-              {(() => {
-                console.log('🎨 [CHECKOUT_MODAL] Rendering SUCCESS screen!', { 
-                  trackingId, 
-                  orderNumber, 
-                  orderSuccess,
-                  timestamp: new Date().toISOString()
-                });
-                return null;
-              })()}
+          {orderSuccess && trackingId ? (
+            <div className="space-y-4">
+              {/* Success Message */}
+              <div className="text-center">
+                <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Thank You!</h3>
+                <p className="text-gray-600 mb-4">
+                  Your order has been sent to {restaurantName}
+                </p>
+              </div>
+
+              {/* Order Receipt */}
+              <OrderReceipt
+                restaurantName={restaurantName}
+                tableNumber={tableNumber}
+                trackingId={trackingId}
+                orderNumber={orderNumber}
+                items={orderItems}
+                totalAmount={orderTotal}
+                orderDate={orderDate}
+              />
+
+              {/* Track Order Link */}
+              <div className="text-center pt-4">
+                <button
+                  onClick={handleCopyTrackingId}
+                  className="text-[#22C55E] hover:text-[#16A34A] font-semibold underline text-sm"
+                >
+                  {copied ? 'Redirecting to track page...' : 'Click here to track your order'}
+                </button>
+              </div>
+            </div>
+          ) : orderSuccess ? (
+            <div className="text-center py-8">
               <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
                 <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -209,64 +250,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
               <p className="text-gray-600 mb-4">
                 Your order has been sent to {restaurantName}
               </p>
-              <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                <p className="text-sm text-gray-600">Table Number</p>
-                <p className="text-2xl font-bold text-gray-900">Table {tableNumber}</p>
-                {trackingId ? (
-                  <div className="mt-3 pt-3 border-t border-gray-200">
-                    <p className="text-sm text-gray-600 mb-2">Tracking ID</p>
-                    <div className="flex items-center justify-center gap-2 bg-white rounded-lg p-3 border border-gray-200">
-                      <p className="text-xl font-bold text-[#22C55E]">{trackingId}</p>
-                      <button
-                        onClick={handleCopyTrackingId}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-[#22C55E] text-white rounded-lg hover:bg-[#16A34A] transition-colors text-sm font-medium"
-                        title="Copy tracking ID"
-                      >
-                        {copied ? (
-                          <>
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                            <span>Copied!</span>
-                          </>
-                        ) : (
-                          <>
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                            </svg>
-                            <span>Copy</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-                    {copied && (
-                      <p className="text-xs text-green-600 mt-2 text-center">
-                        Tracking ID copied! Redirecting to track page...
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <div className="mt-3 pt-3 border-t border-gray-200">
-                    <p className="text-sm text-gray-500">Order ID: {orderNumber.substring(0, 8)}...</p>
-                  </div>
-                )}
-              </div>
-              {trackingId && !copied && (
-                <div className="mb-4">
-                  <p className="text-sm text-gray-600 mb-2">
-                    Click the copy button above to copy your tracking ID and track your order.
-                  </p>
-                </div>
-              )}
-              {!trackingId && (
-                <div className="mb-4">
-                  <p className="text-sm text-gray-600 mb-2">
-                    Your order has been placed successfully. The restaurant will prepare your order shortly.
-                  </p>
-                </div>
-              )}
               <p className="text-sm text-gray-500">
-                The restaurant will prepare your order shortly.
+                Order ID: {orderNumber.substring(0, 8)}...
               </p>
             </div>
           ) : (
