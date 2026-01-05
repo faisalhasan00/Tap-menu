@@ -54,7 +54,8 @@ export const apiRoutes = {
     base: `${API_BASE_URL}/orders`,
     create: `${API_BASE_URL}/orders`,
     getAll: `${API_BASE_URL}/orders`,
-    updateStatus: (id: string) => `${API_BASE_URL}/orders/${id}/status`
+    updateStatus: (id: string) => `${API_BASE_URL}/orders/${id}/status`,
+    track: (trackingId: string) => `${API_BASE_URL}/orders/track/${trackingId}`
   },
 
   // Analytics
@@ -107,7 +108,8 @@ export const frontendRoutes = {
 
   // Customer Menu (Public)
   customer: {
-    menu: (restaurantSlug: string) => `/r/${restaurantSlug}`
+    menu: (restaurantSlug: string) => `/r/${restaurantSlug}`,
+    trackOrder: '/track-order'
   }
 };
 

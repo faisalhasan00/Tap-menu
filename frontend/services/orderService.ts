@@ -9,11 +9,16 @@ export interface OrderItem {
 
 export interface Order {
   _id: string;
-  restaurantId: string;
+  restaurantId: string | {
+    _id: string;
+    name: string;
+    slug: string;
+  };
   tableNumber: number;
   items: OrderItem[];
   totalAmount: number;
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'READY';
+  trackingId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -96,6 +101,22 @@ class OrderService {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || 'Failed to update order status');
+    }
+
+    return response.json();
+  }
+
+  async getOrderByTrackingId(trackingId: string): Promise<{ success: boolean; data: Order }> {
+    const response = await fetch(apiRoutes.orders.track(trackingId), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Order not found');
     }
 
     return response.json();

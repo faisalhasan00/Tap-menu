@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useCart } from '@/contexts/CartContext';
 import { orderService } from '@/services/orderService';
+import { frontendRoutes } from '@/config/routes';
 import Button from '@/components/ui/Button';
 
 interface CheckoutModalProps {
@@ -21,10 +23,12 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   tableNumber,
 }) => {
   const { items, totalPrice, clearCart } = useCart();
+  const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string>('');
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [orderNumber, setOrderNumber] = useState<string>('');
+  const [trackingId, setTrackingId] = useState<string>('');
 
   const handleCheckout = async () => {
     if (items.length === 0) {
@@ -61,14 +65,9 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       console.log('✅ [CHECKOUT] Order created successfully:', response.data._id);
 
       setOrderNumber(response.data._id);
+      setTrackingId(response.data.trackingId || '');
       setOrderSuccess(true);
       clearCart();
-      
-      // Auto-close after 3 seconds
-      setTimeout(() => {
-        setOrderSuccess(false);
-        onClose();
-      }, 3000);
     } catch (err: any) {
       console.error('❌ [CHECKOUT] Order creation failed:', err);
       setError(err.message || 'Failed to place order. Please try again.');
@@ -116,15 +115,33 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Thank You!</h3>
               <p className="text-gray-600 mb-4">
                 Your order has been sent to {restaurantName}
               </p>
               <div className="bg-gray-50 rounded-lg p-4 mb-4">
                 <p className="text-sm text-gray-600">Table Number</p>
                 <p className="text-2xl font-bold text-gray-900">Table {tableNumber}</p>
-                <p className="text-sm text-gray-500 mt-2">Order ID: {orderNumber.substring(0, 8)}...</p>
+                {trackingId && (
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <p className="text-sm text-gray-600 mb-1">Tracking ID</p>
+                    <p className="text-xl font-bold text-[#22C55E]">{trackingId}</p>
+                  </div>
+                )}
               </div>
+              {trackingId && (
+                <div className="mb-4">
+                  <button
+                    onClick={() => {
+                      onClose();
+                      router.push(`${frontendRoutes.customer.trackOrder}?id=${trackingId}`);
+                    }}
+                    className="text-[#22C55E] hover:text-[#16A34A] font-semibold underline text-sm"
+                  >
+                    Click here to track order
+                  </button>
+                </div>
+              )}
               <p className="text-sm text-gray-500">
                 The restaurant will prepare your order shortly.
               </p>
@@ -177,7 +194,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         </div>
 
         {/* Footer */}
-        {!orderSuccess && (
+        {!orderSuccess ? (
           <div className="border-t border-gray-200 p-4">
             <Button
               onClick={handleCheckout}
@@ -195,6 +212,16 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
             >
               Cancel
             </button>
+          </div>
+        ) : (
+          <div className="border-t border-gray-200 p-4">
+            <Button
+              onClick={handleClose}
+              className="w-full"
+              variant="primary"
+            >
+              Close
+            </Button>
           </div>
         )}
       </div>

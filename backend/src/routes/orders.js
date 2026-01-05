@@ -5,7 +5,8 @@ const { ensureRestaurantAccess } = require('../middlewares/restaurantOwnerMiddle
 const {
   createOrder,
   getOrders,
-  updateOrderStatus
+  updateOrderStatus,
+  getOrderByTrackingId
 } = require('../controllers/orderController');
 
 /**
@@ -30,6 +31,13 @@ router.get('/', authMiddleware, restaurantAdminOnly, ensureRestaurantAccess, get
  * @access  Restaurant Owner only
  */
 router.patch('/:id/status', authMiddleware, restaurantAdminOnly, ensureRestaurantAccess, updateOrderStatus);
+
+/**
+ * @route   GET /api/orders/track/:trackingId
+ * @desc    Get order by tracking ID
+ * @access  Public
+ */
+router.get('/track/:trackingId', getOrderByTrackingId);
 
 module.exports = router;
 

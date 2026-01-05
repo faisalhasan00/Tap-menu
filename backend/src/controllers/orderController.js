@@ -4,6 +4,19 @@ const MenuItem = require('../models/MenuItem');
 const Restaurant = require('../models/Restaurant');
 
 /**
+ * Generate a unique tracking ID
+ * Format: TM-XXXXXX (6 alphanumeric characters)
+ */
+const generateTrackingId = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let trackingId = 'TM-';
+  for (let i = 0; i < 6; i++) {
+    trackingId += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return trackingId;
+};
+
+/**
  * @desc    Create a new order
  * @route   POST /api/orders
  * @access  Public (Customer)
@@ -105,17 +118,32 @@ const createOrder = async (req, res) => {
 
     console.log('💰 [CREATE_ORDER] Calculated total amount:', totalAmount);
 
+    // Generate unique tracking ID
+    let trackingId;
+    let isUnique = false;
+    while (!isUnique) {
+      trackingId = generateTrackingId();
+      const existingOrder = await Order.findOne({ trackingId });
+      if (!existingOrder) {
+        isUnique = true;
+      }
+    }
+
+    console.log('📦 [CREATE_ORDER] Generated tracking ID:', trackingId);
+
     // Create order
     const order = await Order.create({
       restaurantId: restaurantId,
       tableNumber: parseInt(tableNumber),
       items: orderItems,
       totalAmount: totalAmount,
-      status: 'PENDING'
+      status: 'PENDING',
+      trackingId: trackingId
     });
 
     console.log('✅ [CREATE_ORDER] Order created successfully:', {
       orderId: order._id,
+      trackingId: order.trackingId,
       restaurantId: order.restaurantId,
       tableNumber: order.tableNumber,
       itemsCount: order.items.length,
@@ -264,9 +292,50 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Get order by tracking ID
+ * @route   GET /api/orders/track/:trackingId
+ * @access  Public
+ */
+const getOrderByTrackingId = async (req, res) => {
+  try {
+    const { trackingId } = req.params;
+
+    if (!trackingId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tracking ID is required'
+      });
+    }
+
+    const order = await Order.findOne({ trackingId })
+      .populate('restaurantId', 'name slug')
+      .populate('items.menuItemId', 'name price image');
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Order not found with this tracking ID'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: order
+    });
+  } catch (error) {
+    console.error('Get order by tracking ID error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
 module.exports = {
   createOrder,
   getOrders,
-  updateOrderStatus
+  updateOrderStatus,
+  getOrderByTrackingId
 };
 

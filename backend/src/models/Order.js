@@ -59,6 +59,11 @@ const orderSchema = new mongoose.Schema(
       required: [true, 'Status is required'],
       default: 'PENDING',
       index: true
+    },
+    trackingId: {
+      type: String,
+      unique: true,
+      sparse: true
     }
   },
   {
@@ -77,6 +82,7 @@ const orderSchema = new mongoose.Schema(
 orderSchema.index({ restaurantId: 1, status: 1 });
 orderSchema.index({ restaurantId: 1, createdAt: -1 });
 orderSchema.index({ tableNumber: 1, restaurantId: 1 });
+// trackingId index is automatically created by unique: true
 
 // Pre-save hook to calculate total amount
 orderSchema.pre('save', function (next) {
