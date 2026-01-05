@@ -34,6 +34,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [orderItems, setOrderItems] = useState<Array<{ name: string; price: number; quantity: number }>>([]);
   const [orderTotal, setOrderTotal] = useState<number>(0);
   const [orderDate, setOrderDate] = useState<string>('');
+  const [renderKey, setRenderKey] = useState<number>(0);
 
   // Debug: Log state changes
   useEffect(() => {
