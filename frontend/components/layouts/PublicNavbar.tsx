@@ -43,7 +43,7 @@ export default function PublicNavbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-[#E2E8F0] h-[72px]">
+    <nav className="sticky top-0 z-50 bg-[#0f2a44] border-b border-[#E2E8F0] h-[72px]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-[72px]">
 
