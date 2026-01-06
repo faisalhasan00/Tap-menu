@@ -32,7 +32,7 @@ export default function PublicNavbar() {
     { name: 'Home', href: '/', anchor: null },
     { name: 'Features', href: '/', anchor: '#features' },
     { name: 'How It Works', href: '/', anchor: '#how-it-works' },
-    { name: 'Contact', href: '/contact', anchor: null },
+    { name: 'Contact', href: '/contact', anchor: '#Contact' },
   ];
 
   const isActive = (href: string) => {
@@ -68,7 +68,7 @@ export default function PublicNavbar() {
               <Link
                 key={item.href + (item.anchor || '')}
                 href={item.anchor ? `${item.href}${item.anchor}` : item.href}
-                className={`text-[#0F172A] font-medium transition-colors duration-200 hover:text-[#22C55E] ${isActive(item.href) ? 'text-[#22C55E]' : ''
+                className={`text-[#f7f7f8] font-medium transition-colors duration-200 hover:text-[#22C55E] ${isActive(item.href) ? 'text-[#22C55E]' : ''
                   }`}
               >
                 {item.name}
