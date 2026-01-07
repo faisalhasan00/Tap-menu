@@ -35,7 +35,6 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [orderItems, setOrderItems] = useState<Array<{ name: string; price: number; quantity: number }>>([]);
   const [orderTotal, setOrderTotal] = useState<number>(0);
   const [orderDate, setOrderDate] = useState<string>('');
-  const [renderKey, setRenderKey] = useState<number>(0);
 
   // Debug: Log state changes
   useEffect(() => {
@@ -115,7 +114,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
       console.log('✅ [CHECKOUT] Receipt items prepared:', receiptItems);
 
-      // Set all states synchronously - React 18 will batch these
+      // Set all states - React 18 will batch these updates
+      // IMPORTANT: Set orderSuccess LAST to ensure all data is ready before showing success screen
       setOrderNumber(orderId);
       setTrackingId(trackId);
       setTrackingNumber(response.data?.trackingNumber || '');
@@ -123,8 +123,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setOrderTotal(response.data.totalAmount || totalPrice);
       setOrderDate(response.data.createdAt || new Date().toISOString());
       setIsProcessing(false);
+      // Set orderSuccess to true AFTER all other state is set
       setOrderSuccess(true);
-      setRenderKey(prev => prev + 1);
 
       clearCart();
 
@@ -197,17 +197,22 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   };
 
   // Reset state when modal closes (only reset if order was not successful)
+  // This ensures we don't reset state while showing success screen
   useEffect(() => {
-    if (!isOpen && !orderSuccess) {
-      setError('');
-      setTrackingId('');
-      setTrackingNumber('');
-      setOrderNumber('');
-      setOrderItems([]);
-      setCopied(false);
-      setRenderKey(0);
+    if (!isOpen) {
+      // Only reset if we're not in success state
+      if (!orderSuccess) {
+        setError('');
+        setTrackingId('');
+        setTrackingNumber('');
+        setOrderNumber('');
+        setOrderItems([]);
+        setCopied(false);
+      }
+      // Always reset orderSuccess when modal closes
+      setOrderSuccess(false);
     }
-  }, [isOpen, orderSuccess]);
+  }, [isOpen]);
 
   // Log render state for debugging
   useEffect(() => {
@@ -229,7 +234,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center p-4">
-      <div key={renderKey} className={`bg-white rounded-lg shadow-xl ${orderSuccess ? 'max-w-2xl' : 'max-w-md'} w-full max-h-[90vh] overflow-hidden flex flex-col z-[10000]`}>
+      <div className={`bg-white rounded-lg shadow-xl ${orderSuccess ? 'max-w-2xl' : 'max-w-md'} w-full max-h-[90vh] overflow-hidden flex flex-col z-[10000]`}>
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
           <h2 className="text-xl font-bold text-gray-900">
