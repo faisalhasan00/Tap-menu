@@ -191,6 +191,17 @@ function TrackOrderContent() {
     return `${hours}h ${remainingMinutes}m remaining`;
   };
 
+  const handleDownloadInvoice = async () => {
+    if (!order) return;
+
+    try {
+      await generateInvoiceFromOrder(order, restaurantName);
+    } catch (error: any) {
+      console.error('Error downloading invoice:', error);
+      alert(error.message || 'Failed to download invoice. Please try again.');
+    }
+  };
+
   if (loading) {
     return (
       <PublicLayout>

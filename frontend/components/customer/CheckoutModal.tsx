@@ -57,7 +57,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const handleCheckout = async () => {
     console.log('🛒 [CHECKOUT] handleCheckout called', { itemsCount: items.length, items });
-    
+
     if (items.length === 0) {
       setError('Your cart is empty');
       return;
@@ -89,7 +89,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       });
 
       const response = await orderService.createOrder(orderData);
-      
+
       console.log('✅ [CHECKOUT] Order created successfully:', response);
       console.log('✅ [CHECKOUT] Full response:', JSON.stringify(response, null, 2));
       console.log('✅ [CHECKOUT] Order data:', response.data);
@@ -103,18 +103,18 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
       const orderId = response.data._id || '';
       const trackId = response.data?.trackingNumber || response.data?.trackingId || '';
-      
+
       console.log('✅ [CHECKOUT] Setting state:', { orderId, trackId, trackingNumber: response.data?.trackingNumber });
-      
+
       // Store order items and details for receipt
       const receiptItems = (response.data.items || []).map((item: any) => ({
         name: item.name || 'Unknown Item',
         price: item.price || 0,
         quantity: item.quantity || 1
       }));
-      
+
       console.log('✅ [CHECKOUT] Receipt items prepared:', receiptItems);
-      
+
       // Set all states synchronously - React 18 will batch these
       setOrderNumber(orderId);
       setTrackingId(trackId);
@@ -125,9 +125,9 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setIsProcessing(false);
       setOrderSuccess(true);
       setRenderKey(prev => prev + 1);
-      
+
       clearCart();
-      
+
       // Store order data for the success page
       const successData = {
         restaurantName,
@@ -140,11 +140,11 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         orderDate: response.data.createdAt || new Date().toISOString(),
         estimatedTime: response.data.estimatedTime || 15,
       };
-      
+
       localStorage.setItem('orderSuccessData', JSON.stringify(successData));
-      
+
       // Note: Modal stays open to show success screen, navigation happens when user clicks "Track Order"
-      
+
       console.log('✅ [CHECKOUT] All states set synchronously:', {
         orderSuccess: true,
         orderId,
@@ -182,7 +182,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     try {
       await navigator.clipboard.writeText(trackNum);
       setCopied(true);
-      
+
       // Redirect to track order page after a short delay
       setTimeout(() => {
         onClose();
