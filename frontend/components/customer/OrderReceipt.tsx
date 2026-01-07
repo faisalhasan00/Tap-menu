@@ -22,6 +22,7 @@ const OrderReceipt: React.FC<OrderReceiptProps> = ({
   restaurantName,
   tableNumber,
   trackingId,
+  trackingNumber,
   orderNumber,
   items,
   totalAmount,
@@ -29,6 +30,7 @@ const OrderReceipt: React.FC<OrderReceiptProps> = ({
   hideDownloadButtons = false,
 }) => {
   const receiptRef = useRef<HTMLDivElement>(null);
+  const displayTrackingNumber = trackingNumber || trackingId;
 
   const handleDownloadPDF = async () => {
     if (!receiptRef.current) return;
