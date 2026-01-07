@@ -118,13 +118,17 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       // Reset processing state
       setIsProcessing(false);
 
-      // Close the checkout modal
-      onClose();
-
-      // Notify parent component about order success
+      // IMPORTANT: Notify parent FIRST with order data
+      // Use setTimeout to ensure state update happens before modal closes
       if (onOrderSuccess) {
+        // Call callback immediately to set parent state
         onOrderSuccess(successData);
       }
+
+      // Close the checkout modal after a brief delay to ensure state is set
+      setTimeout(() => {
+        onClose();
+      }, 0);
 
       console.log('✅ [CHECKOUT] Order created successfully:', {
         orderId,

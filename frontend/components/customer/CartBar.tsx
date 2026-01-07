@@ -171,8 +171,12 @@ const CartBar: React.FC<CartBarProps> = ({
           restaurantName={restaurantName}
           tableNumber={tableNumber}
           onOrderSuccess={(orderData) => {
+            console.log('🎉 [CART_BAR] Order success callback received:', orderData);
+            // Set order success data first
             setOrderSuccessData(orderData);
+            // Close checkout modal
             setShowCheckout(false);
+            console.log('🎉 [CART_BAR] Order success state set, modal closed');
           }}
         />
       )}
