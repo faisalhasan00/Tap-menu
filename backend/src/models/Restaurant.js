@@ -31,6 +31,12 @@ const restaurantSchema = new mongoose.Schema(
       required: [true, 'Status is required'],
       default: 'ACTIVE'
     },
+    defaultPreparationTime: {
+      type: Number,
+      default: 15,
+      min: [1, 'Default preparation time must be at least 1 minute'],
+      max: [300, 'Default preparation time cannot exceed 300 minutes']
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

@@ -18,7 +18,9 @@ export interface Order {
   items: OrderItem[];
   totalAmount: number;
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'READY';
-  trackingId?: string;
+  trackingId?: string; // Legacy field for backward compatibility
+  trackingNumber: string; // New user-friendly tracking number (DM-ORD-{number})
+  estimatedTime: number;
   createdAt: string;
   updatedAt: string;
 }

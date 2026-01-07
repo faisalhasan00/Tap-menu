@@ -4,7 +4,7 @@ const MenuItem = require('../models/MenuItem');
 const Restaurant = require('../models/Restaurant');
 
 /**
- * Generate a unique tracking ID
+ * Generate a unique tracking ID (legacy format)
  * Format: TM-XXXXXX (6 alphanumeric characters)
  */
 const generateTrackingId = () => {
@@ -14,6 +14,38 @@ const generateTrackingId = () => {
     trackingId += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   return trackingId;
+};
+
+/**
+ * Generate a unique tracking number
+ * Format: DM-ORD-{6-8 digit number}
+ */
+const generateTrackingNumber = async () => {
+  let isUnique = false;
+  let trackingNumber;
+  let attempts = 0;
+  const maxAttempts = 10;
+
+  while (!isUnique && attempts < maxAttempts) {
+    // Generate a 6-8 digit number
+    const randomNum = Math.floor(100000 + Math.random() * 900000); // 6 digits
+    trackingNumber = `DM-ORD-${randomNum}`;
+    
+    // Check if it already exists
+    const existingOrder = await Order.findOne({ trackingNumber });
+    if (!existingOrder) {
+      isUnique = true;
+    }
+    attempts++;
+  }
+
+  if (!isUnique) {
+    // Fallback: use timestamp-based number if all attempts failed
+    const timestamp = Date.now().toString().slice(-8);
+    trackingNumber = `DM-ORD-${timestamp}`;
+  }
+
+  return trackingNumber;
 };
 
 /**
@@ -131,6 +163,14 @@ const createOrder = async (req, res) => {
 
     console.log('📦 [CREATE_ORDER] Generated tracking ID:', trackingId);
 
+    // Generate unique tracking number (new format: DM-ORD-{number})
+    const trackingNumber = await generateTrackingNumber();
+    console.log('📦 [CREATE_ORDER] Generated tracking number:', trackingNumber);
+
+    // Get estimated preparation time from restaurant (default to 15 minutes if not set)
+    const estimatedTime = restaurant.defaultPreparationTime || 15;
+    console.log('⏱️ [CREATE_ORDER] Estimated preparation time:', estimatedTime, 'minutes');
+
     // Create order
     const order = await Order.create({
       restaurantId: restaurantId,
@@ -138,7 +178,9 @@ const createOrder = async (req, res) => {
       items: orderItems,
       totalAmount: totalAmount,
       status: 'PENDING',
-      trackingId: trackingId
+      trackingId: trackingId, // Legacy field for backward compatibility
+      trackingNumber: trackingNumber, // New user-friendly tracking number
+      estimatedTime: estimatedTime
     });
 
     // Convert Mongoose document to plain object to ensure all fields are included
@@ -147,6 +189,7 @@ const createOrder = async (req, res) => {
     console.log('✅ [CREATE_ORDER] Order created successfully:', {
       orderId: order._id,
       trackingId: order.trackingId,
+      trackingNumber: order.trackingNumber,
       restaurantId: order.restaurantId,
       tableNumber: order.tableNumber,
       itemsCount: order.items.length,
@@ -156,7 +199,9 @@ const createOrder = async (req, res) => {
     console.log('✅ [CREATE_ORDER] Order object to send:', {
       _id: orderObject._id,
       trackingId: orderObject.trackingId,
-      hasTrackingId: 'trackingId' in orderObject
+      trackingNumber: orderObject.trackingNumber,
+      hasTrackingId: 'trackingId' in orderObject,
+      hasTrackingNumber: 'trackingNumber' in orderObject
     });
 
     res.status(201).json({
@@ -302,7 +347,7 @@ const updateOrderStatus = async (req, res) => {
 };
 
 /**
- * @desc    Get order by tracking ID
+ * @desc    Get order by tracking ID or tracking number
  * @route   GET /api/orders/track/:trackingId
  * @access  Public
  */
@@ -313,18 +358,26 @@ const getOrderByTrackingId = async (req, res) => {
     if (!trackingId) {
       return res.status(400).json({
         success: false,
-        message: 'Tracking ID is required'
+        message: 'Tracking ID or tracking number is required'
       });
     }
 
-    const order = await Order.findOne({ trackingId })
+    // Try to find by trackingNumber first (new format), then fallback to trackingId (legacy)
+    let order = await Order.findOne({ trackingNumber: trackingId })
       .populate('restaurantId', 'name slug')
       .populate('items.menuItemId', 'name price image');
+
+    // If not found by trackingNumber, try trackingId (for backward compatibility)
+    if (!order) {
+      order = await Order.findOne({ trackingId: trackingId })
+        .populate('restaurantId', 'name slug')
+        .populate('items.menuItemId', 'name price image');
+    }
 
     if (!order) {
       return res.status(404).json({
         success: false,
-        message: 'Order not found with this tracking ID'
+        message: 'Order not found with this tracking ID or number'
       });
     }
 

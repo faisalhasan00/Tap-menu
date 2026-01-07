@@ -28,7 +28,9 @@ interface Order {
   }>;
   totalAmount: number;
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'READY';
-  trackingId?: string;
+  trackingId?: string; // Legacy field
+  trackingNumber?: string; // New format: DM-ORD-{number}
+  estimatedTime: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -179,13 +181,19 @@ function TrackOrderContent() {
                     <p className="font-semibold text-gray-900">Table {order.tableNumber}</p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Tracking ID</p>
-                    <p className="font-semibold text-[#22C55E]">{order.trackingId}</p>
+                    <p className="text-gray-600">Tracking Number</p>
+                    <p className="font-semibold text-[#22C55E]">{order.trackingNumber || order.trackingId}</p>
                   </div>
                   <div>
                     <p className="text-gray-600">Order Date</p>
                     <p className="font-semibold text-gray-900">
                       {new Date(order.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600">Estimated Time</p>
+                    <p className="font-semibold text-[#22C55E]">
+                      {order.estimatedTime ? `${order.estimatedTime} minute${order.estimatedTime !== 1 ? 's' : ''}` : 'N/A'}
                     </p>
                   </div>
                 </div>

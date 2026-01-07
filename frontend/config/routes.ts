@@ -109,7 +109,9 @@ export const frontendRoutes = {
   // Customer Menu (Public)
   customer: {
     menu: (restaurantSlug: string) => `/r/${restaurantSlug}`,
-    trackOrder: '/track-order'
+    trackOrder: '/track-order',
+    track: (id: string) => `/track/${id}`,
+    orderSuccess: '/order-success'
   }
 };
 

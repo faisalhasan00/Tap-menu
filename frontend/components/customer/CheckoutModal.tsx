@@ -30,6 +30,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [orderNumber, setOrderNumber] = useState<string>('');
   const [trackingId, setTrackingId] = useState<string>('');
+  const [trackingNumber, setTrackingNumber] = useState<string>('');
   const [copied, setCopied] = useState(false);
   const [orderItems, setOrderItems] = useState<Array<{ name: string; price: number; quantity: number }>>([]);
   const [orderTotal, setOrderTotal] = useState<number>(0);
@@ -101,9 +102,9 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       }
 
       const orderId = response.data._id || '';
-      const trackId = response.data?.trackingId || '';
+      const trackId = response.data?.trackingNumber || response.data?.trackingId || '';
       
-      console.log('✅ [CHECKOUT] Setting state:', { orderId, trackId });
+      console.log('✅ [CHECKOUT] Setting state:', { orderId, trackId, trackingNumber: response.data?.trackingNumber });
       
       // Store order items and details for receipt
       const receiptItems = (response.data.items || []).map((item: any) => ({
@@ -117,6 +118,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       // Set all states synchronously - React 18 will batch these
       setOrderNumber(orderId);
       setTrackingId(trackId);
+      setTrackingNumber(response.data?.trackingNumber || '');
       setOrderItems(receiptItems);
       setOrderTotal(response.data.totalAmount || totalPrice);
       setOrderDate(response.data.createdAt || new Date().toISOString());
@@ -126,22 +128,29 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       
       clearCart();
       
+      // Store order data for the success page
+      const successData = {
+        restaurantName,
+        orderId,
+        trackingId: response.data?.trackingNumber || trackId, // Use trackingNumber (new format) or fallback to trackingId
+        trackingNumber: response.data?.trackingNumber || trackId, // Primary tracking number
+        tableNumber,
+        items: receiptItems,
+        totalAmount: response.data.totalAmount || totalPrice,
+        orderDate: response.data.createdAt || new Date().toISOString(),
+        estimatedTime: response.data.estimatedTime || 15,
+      };
+      
+      localStorage.setItem('orderSuccessData', JSON.stringify(successData));
+      
+      // Navigate to order success page after a short delay
+      setTimeout(() => {
+        onClose();
+        router.push(frontendRoutes.customer.orderSuccess);
+      }, 1500);
+      
       console.log('✅ [CHECKOUT] All states set synchronously:', {
         orderSuccess: true,
-        orderId,
-        trackId,
-        receiptItemsCount: receiptItems.length,
-        orderTotal: response.data.totalAmount || totalPrice
-      });
-      
-      console.log('✅ [CHECKOUT] All states initialized:', {
-        orderId,
-        trackId,
-        receiptItemsCount: receiptItems.length,
-        orderTotal: response.data.totalAmount || totalPrice
-      });
-      
-      console.log('✅ [CHECKOUT] States initialized:', {
         orderId,
         trackId,
         receiptItemsCount: receiptItems.length,
@@ -171,22 +180,23 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   };
 
   const handleCopyTrackingId = async () => {
-    if (!trackingId) return;
+    const trackNum = trackingNumber || trackingId;
+    if (!trackNum) return;
 
     try {
-      await navigator.clipboard.writeText(trackingId);
+      await navigator.clipboard.writeText(trackNum);
       setCopied(true);
       
       // Redirect to track order page after a short delay
       setTimeout(() => {
         onClose();
-        router.push(`${frontendRoutes.customer.trackOrder}?id=${trackingId}`);
+        router.push(frontendRoutes.customer.track(trackNum));
       }, 1000);
     } catch (err) {
       console.error('Failed to copy tracking ID:', err);
       // Fallback: redirect even if copy fails
       onClose();
-      router.push(`${frontendRoutes.customer.trackOrder}?id=${trackingId}`);
+      router.push(frontendRoutes.customer.track(trackNum));
     }
   };
 
@@ -275,7 +285,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       Your order will arrive in approximately 10 minutes
                     </p>
                     <div className="bg-[#22C55E] bg-opacity-10 border border-[#22C55E] rounded-lg p-3 mt-4">
-                      <p className="text-sm text-gray-700 font-medium mb-1">Tracking ID:</p>
+                      <p className="text-sm text-gray-700 font-medium mb-1">Tracking Number:</p>
                       <p className="text-xl font-bold text-[#22C55E] tracking-wider">{trackingId}</p>
                     </div>
                   </div>
@@ -286,6 +296,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   restaurantName={restaurantName}
                   tableNumber={tableNumber}
                   trackingId={trackingId}
+                  trackingNumber={trackingNumber}
                   orderNumber={orderNumber}
                   items={orderItems}
                   totalAmount={orderTotal}

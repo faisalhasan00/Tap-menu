@@ -64,6 +64,17 @@ const orderSchema = new mongoose.Schema(
       type: String,
       unique: true,
       sparse: true
+    },
+    trackingNumber: {
+      type: String,
+      unique: true,
+      sparse: true,
+      required: [true, 'Tracking number is required']
+    },
+    estimatedTime: {
+      type: Number,
+      required: [true, 'Estimated time is required'],
+      min: [1, 'Estimated time must be at least 1 minute']
     }
   },
   {
@@ -82,7 +93,8 @@ const orderSchema = new mongoose.Schema(
 orderSchema.index({ restaurantId: 1, status: 1 });
 orderSchema.index({ restaurantId: 1, createdAt: -1 });
 orderSchema.index({ tableNumber: 1, restaurantId: 1 });
-// trackingId index is automatically created by unique: true
+orderSchema.index({ trackingNumber: 1 });
+// trackingId and trackingNumber indexes are automatically created by unique: true
 
 // Pre-save hook to calculate total amount
 orderSchema.pre('save', function (next) {
