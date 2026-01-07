@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import CheckoutModal from './CheckoutModal';
+import OrderSuccess from './OrderSuccess';
 
 interface CartBarProps {
   restaurantId?: string;
@@ -18,6 +19,17 @@ const CartBar: React.FC<CartBarProps> = ({
   const { items, totalItems, totalPrice, updateQuantity, removeFromCart, clearCart } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [orderSuccessData, setOrderSuccessData] = useState<{
+    restaurantName: string;
+    orderId: string;
+    trackingId: string;
+    trackingNumber?: string;
+    tableNumber: number;
+    items: Array<{ name: string; price: number; quantity: number }>;
+    totalAmount: number;
+    orderDate: string;
+    estimatedTime: number;
+  } | null>(null);
 
   if (totalItems === 0) {
     return null;
@@ -158,6 +170,26 @@ const CartBar: React.FC<CartBarProps> = ({
           restaurantId={restaurantId}
           restaurantName={restaurantName}
           tableNumber={tableNumber}
+          onOrderSuccess={(orderData) => {
+            setOrderSuccessData(orderData);
+            setShowCheckout(false);
+          }}
+        />
+      )}
+
+      {/* Order Success Screen */}
+      {orderSuccessData && (
+        <OrderSuccess
+          restaurantName={orderSuccessData.restaurantName}
+          orderId={orderSuccessData.orderId}
+          trackingId={orderSuccessData.trackingId}
+          trackingNumber={orderSuccessData.trackingNumber}
+          tableNumber={orderSuccessData.tableNumber}
+          items={orderSuccessData.items}
+          totalAmount={orderSuccessData.totalAmount}
+          orderDate={orderSuccessData.orderDate}
+          estimatedTime={orderSuccessData.estimatedTime}
+          onClose={() => setOrderSuccessData(null)}
         />
       )}
     </>
