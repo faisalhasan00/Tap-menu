@@ -143,11 +143,7 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       
       localStorage.setItem('orderSuccessData', JSON.stringify(successData));
       
-      // Navigate to order success page after a short delay
-      setTimeout(() => {
-        onClose();
-        router.push(frontendRoutes.customer.orderSuccess);
-      }, 1500);
+      // Note: Modal stays open to show success screen, navigation happens when user clicks "Track Order"
       
       console.log('✅ [CHECKOUT] All states set synchronously:', {
         orderSuccess: true,
@@ -200,39 +196,34 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
     }
   };
 
-  // Reset state when modal closes
+  // Reset state when modal closes (only reset if order was not successful)
   useEffect(() => {
-    if (!isOpen) {
-      setOrderSuccess(false);
+    if (!isOpen && !orderSuccess) {
       setError('');
       setTrackingId('');
+      setTrackingNumber('');
       setOrderNumber('');
       setOrderItems([]);
       setCopied(false);
       setRenderKey(0);
     }
-  }, [isOpen]);
+  }, [isOpen, orderSuccess]);
 
-  // Log render state and force re-render if needed
+  // Log render state for debugging
   useEffect(() => {
     if (isOpen) {
       console.log('🔍 [CHECKOUT_MODAL] Render state:', {
         isOpen,
         orderSuccess,
         trackingId,
+        trackingNumber,
         orderNumber,
         error,
         isProcessing,
-        orderItemsCount: orderItems.length,
-        shouldShowSuccess: orderSuccess && isOpen && trackingId
+        orderItemsCount: orderItems.length
       });
-      
-      // If we have success state but UI isn't showing, force a re-render
-      if (orderSuccess && trackingId && orderItems.length === 0) {
-        console.log('⚠️ [CHECKOUT_MODAL] Success state but no items - checking response data');
-      }
     }
-  }, [isOpen, orderSuccess, trackingId, orderNumber, error, isProcessing, orderItems.length]);
+  }, [isOpen, orderSuccess, trackingId, trackingNumber, orderNumber, error, isProcessing, orderItems.length]);
 
   if (!isOpen) return null;
 
@@ -258,44 +249,40 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4">
-          {(() => {
-            console.log('🎨 [CHECKOUT_MODAL] Rendering content:', {
-              orderSuccess,
-              trackingId,
-              orderItemsCount: orderItems.length,
-              orderNumber,
-              shouldShowSuccess: orderSuccess && trackingId
-            });
-            
-            if (orderSuccess && trackingId) {
-              return (
-                <div className="space-y-4" key={`success-${trackingId}`}>
-                  {/* Success Message */}
-                  <div className="text-center">
-                    <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                      <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">Thank You!</h3>
-                    <p className="text-gray-600 mb-2">
-                      Your order has been sent to {restaurantName}
-                    </p>
-                    <p className="text-lg font-semibold text-[#22C55E] mb-2">
-                      Your order will arrive in approximately 10 minutes
-                    </p>
-                    <div className="bg-[#22C55E] bg-opacity-10 border border-[#22C55E] rounded-lg p-3 mt-4">
-                      <p className="text-sm text-gray-700 font-medium mb-1">Tracking Number:</p>
-                      <p className="text-xl font-bold text-[#22C55E] tracking-wider">{trackingId}</p>
-                    </div>
+          {orderSuccess ? (
+            // Thank You / Success Screen
+            <div className="space-y-4">
+              {/* Success Message */}
+              <div className="text-center">
+                <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Thank You!</h3>
+                <p className="text-gray-600 mb-2">
+                  Your order has been sent to {restaurantName}
+                </p>
+                {(trackingNumber || trackingId) && (
+                  <div className="bg-[#22C55E] bg-opacity-10 border border-[#22C55E] rounded-lg p-3 mt-4">
+                    <p className="text-sm text-gray-700 font-medium mb-1">Tracking Number:</p>
+                    <p className="text-xl font-bold text-[#22C55E] tracking-wider">{trackingNumber || trackingId}</p>
                   </div>
+                )}
+                {orderNumber && !trackingNumber && !trackingId && (
+                  <div className="bg-gray-100 border border-gray-300 rounded-lg p-3 mt-4">
+                    <p className="text-sm text-gray-700 font-medium mb-1">Order ID:</p>
+                    <p className="text-lg font-bold text-gray-900">{orderNumber.substring(0, 20)}...</p>
+                  </div>
+                )}
+              </div>
 
               {/* Order Receipt */}
               {orderItems.length > 0 ? (
                 <OrderReceipt
                   restaurantName={restaurantName}
                   tableNumber={tableNumber}
-                  trackingId={trackingId}
+                  trackingId={trackingId || trackingNumber || orderNumber}
                   trackingNumber={trackingNumber}
                   orderNumber={orderNumber}
                   items={orderItems}
@@ -307,45 +294,24 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   <p className="text-gray-600 mb-2">Order Receipt</p>
                   <p className="text-sm text-gray-500">Table: {tableNumber}</p>
                   <p className="text-sm text-gray-500">Total: ₹{orderTotal > 0 ? orderTotal.toFixed(2) : '0.00'}</p>
-                  <p className="text-xs text-gray-400 mt-2">Receipt details loading...</p>
                 </div>
               )}
 
-                  {/* Track Order Link */}
-                  <div className="text-center pt-4">
-                    <button
-                      onClick={handleCopyTrackingId}
-                      className="text-[#22C55E] hover:text-[#16A34A] font-semibold underline text-sm"
-                    >
-                      {copied ? 'Redirecting to track page...' : 'Click here to track your order'}
-                    </button>
-                  </div>
+              {/* Track Order Link */}
+              {(trackingNumber || trackingId) && (
+                <div className="text-center pt-4">
+                  <button
+                    onClick={handleCopyTrackingId}
+                    className="text-[#22C55E] hover:text-[#16A34A] font-semibold underline text-sm"
+                  >
+                    {copied ? 'Redirecting to track page...' : 'Click here to track your order'}
+                  </button>
                 </div>
-              );
-            }
-            
-            if (orderSuccess && !trackingId) {
-              return (
-            <div className="text-center py-8">
-              <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Thank You!</h3>
-              <p className="text-gray-600 mb-4">
-                Your order has been sent to {restaurantName}
-              </p>
-                <p className="text-sm text-gray-500">
-                  Order ID: {orderNumber.substring(0, 8)}...
-                </p>
-              </div>
-              );
-            }
-            
-            // Default: Show checkout form
-            return (
-              <>
+              )}
+            </div>
+          ) : (
+            // Checkout Form
+            <>
               {/* Order Summary */}
               <div className="mb-4">
                 <h3 className="font-semibold text-gray-900 mb-2">Order Summary</h3>
@@ -387,9 +353,8 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   <span className="text-xl font-bold text-[#22C55E]">₹{totalPrice.toFixed(2)}</span>
                 </div>
               </div>
-              </>
-            );
-          })()}
+            </>
+          )}
         </div>
 
         {/* Footer */}
