@@ -109,9 +109,6 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
         estimatedTime: response.data.estimatedTime || 15,
       };
 
-      // Store order data for the success page (for navigation)
-      localStorage.setItem('orderSuccessData', JSON.stringify(successData));
-
       // Clear cart
       clearCart();
 
@@ -119,16 +116,14 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setIsProcessing(false);
 
       // IMPORTANT: Notify parent FIRST with order data
-      // Use setTimeout to ensure state update happens before modal closes
+      // This ensures parent state is updated before modal closes
       if (onOrderSuccess) {
-        // Call callback immediately to set parent state
         onOrderSuccess(successData);
       }
 
-      // Close the checkout modal after a brief delay to ensure state is set
-      setTimeout(() => {
-        onClose();
-      }, 0);
+      // Close the checkout modal
+      // Parent will handle closing based on state updates
+      onClose();
 
       console.log('✅ [CHECKOUT] Order created successfully:', {
         orderId,

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import CheckoutModal from './CheckoutModal';
-import OrderSuccess from './OrderSuccess';
+import OrderSuccessScreen from './OrderSuccessScreen';
 
 interface CartBarProps {
   restaurantId?: string;
@@ -17,9 +17,12 @@ const CartBar: React.FC<CartBarProps> = ({
   tableNumber 
 }) => {
   const { items, totalItems, totalPrice, updateQuantity, removeFromCart, clearCart } = useCart();
-  const [isOpen, setIsOpen] = useState(false);
-  const [showCheckout, setShowCheckout] = useState(false);
-  const [orderSuccessData, setOrderSuccessData] = useState<{
+  
+  // State management following production architecture
+  const [isOpen, setIsOpen] = useState(false); // Cart modal state
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false); // Checkout modal state
+  const [orderSuccess, setOrderSuccess] = useState(false); // Order success state
+  const [orderData, setOrderData] = useState<{
     restaurantName: string;
     orderId: string;
     trackingId: string;
@@ -148,7 +151,7 @@ const CartBar: React.FC<CartBarProps> = ({
                     setIsOpen(false);
                     // Small delay to ensure cart modal closes before checkout opens
                     setTimeout(() => {
-                      setShowCheckout(true);
+                      setIsCheckoutOpen(true);
                       console.log('🛒 [CART_BAR] Checkout modal should open now');
                     }, 100);
                   }}
@@ -162,38 +165,45 @@ const CartBar: React.FC<CartBarProps> = ({
         </div>
       )}
 
-      {/* Checkout Modal */}
-      {restaurantId && tableNumber && (
+      {/* Checkout Modal - Only render when checkout is open AND order is not successful */}
+      {restaurantId && tableNumber && isCheckoutOpen && !orderSuccess && (
         <CheckoutModal
-          isOpen={showCheckout}
-          onClose={() => setShowCheckout(false)}
+          isOpen={isCheckoutOpen}
+          onClose={() => {
+            setIsCheckoutOpen(false);
+          }}
           restaurantId={restaurantId}
           restaurantName={restaurantName}
           tableNumber={tableNumber}
           onOrderSuccess={(orderData) => {
             console.log('🎉 [CART_BAR] Order success callback received:', orderData);
-            // Set order success data first
-            setOrderSuccessData(orderData);
-            // Close checkout modal
-            setShowCheckout(false);
+            // Set order data
+            setOrderData(orderData);
+            // Set order success state
+            setOrderSuccess(true);
+            // Close checkout modal safely
+            setIsCheckoutOpen(false);
             console.log('🎉 [CART_BAR] Order success state set, modal closed');
           }}
         />
       )}
 
-      {/* Order Success Screen */}
-      {orderSuccessData && (
-        <OrderSuccess
-          restaurantName={orderSuccessData.restaurantName}
-          orderId={orderSuccessData.orderId}
-          trackingId={orderSuccessData.trackingId}
-          trackingNumber={orderSuccessData.trackingNumber}
-          tableNumber={orderSuccessData.tableNumber}
-          items={orderSuccessData.items}
-          totalAmount={orderSuccessData.totalAmount}
-          orderDate={orderSuccessData.orderDate}
-          estimatedTime={orderSuccessData.estimatedTime}
-          onClose={() => setOrderSuccessData(null)}
+      {/* Order Success Screen - Rendered OUTSIDE of CheckoutModal */}
+      {orderSuccess && orderData && (
+        <OrderSuccessScreen
+          restaurantName={orderData.restaurantName}
+          orderId={orderData.orderId}
+          trackingId={orderData.trackingId}
+          trackingNumber={orderData.trackingNumber}
+          tableNumber={orderData.tableNumber}
+          items={orderData.items}
+          totalAmount={orderData.totalAmount}
+          orderDate={orderData.orderDate}
+          estimatedTime={orderData.estimatedTime}
+          onClose={() => {
+            setOrderSuccess(false);
+            setOrderData(null);
+          }}
         />
       )}
     </>
