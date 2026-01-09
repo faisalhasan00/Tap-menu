@@ -62,7 +62,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <header className="relative min-h-[65vh] sm:min-h-[70vh] lg:min-h-[75vh] flex items-center overflow-hidden">
+      <header className="relative min-h-[70vh] md:min-h-[75vh] lg:min-h-[80vh] flex items-center overflow-hidden">
         {/* Background Image with Overlay */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -74,19 +74,44 @@ export default function Home() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 md:py-12 lg:py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-10 items-center">
             {/* Left Side - Text Content */}
-            <div className="text-white text-center lg:text-left">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 leading-tight">
+            <div className="text-white text-center lg:text-left order-1">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 md:mb-4 leading-tight">
                 QR Menu for Restaurants: Digital Menu & Table Ordering System
               </h1>
-              <p className="text-sm sm:text-base lg:text-lg text-gray-200 mb-4 sm:mb-6 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+              <p className="text-sm sm:text-base lg:text-lg text-gray-200 mb-3 sm:mb-4 md:mb-6 leading-relaxed max-w-2xl mx-auto lg:mx-0">
                 Let customers order from their table while you manage everything from one dashboard.
               </p>
 
-              {/* Benefit Bullet Points */}
-              <ul className="space-y-2 sm:space-y-3 mb-6 sm:mb-8 max-w-xl mx-auto lg:mx-0">
+              {/* CTA Buttons - Moved up for mobile visibility */}
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center lg:justify-start mb-4 sm:mb-5 md:mb-6">
+                <a
+                  href="/owner/login"
+                  className="bg-[#22C55E] text-white px-5 sm:px-6 lg:px-8 py-3 sm:py-3 rounded-full font-semibold text-sm sm:text-base transition-all duration-200 hover:bg-[#16A34A] hover:shadow-lg text-center min-h-[44px] flex items-center justify-center"
+                >
+                  Get Started
+                </a>
+                <a
+                  href="/contact"
+                  className="border-2 border-white text-white px-5 sm:px-6 lg:px-8 py-3 sm:py-3 rounded-full font-semibold text-sm sm:text-base transition-all duration-200 hover:bg-white hover:text-[#0F172A] text-center min-h-[44px] flex items-center justify-center"
+                >
+                  Book Free Demo
+                </a>
+                <a
+                  href="/track-order"
+                  className="bg-white bg-opacity-20 backdrop-blur-sm text-white px-5 sm:px-6 lg:px-8 py-3 sm:py-3 rounded-full font-semibold text-sm sm:text-base transition-all duration-200 hover:bg-opacity-30 hover:shadow-lg text-center flex items-center justify-center gap-2 min-h-[44px]"
+                >
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Track Order
+                </a>
+              </div>
+
+              {/* Benefit Bullet Points - Limited on mobile */}
+              <ul className="space-y-2 sm:space-y-3 max-w-xl mx-auto lg:mx-0">
                 <li className="flex items-start gap-2 sm:gap-3">
                   <svg
                     className="w-4 h-4 sm:w-5 sm:h-5 text-[#22C55E] flex-shrink-0 mt-0.5"
@@ -121,7 +146,7 @@ export default function Home() {
                   </svg>
                   <span className="text-xs sm:text-sm lg:text-base text-gray-100">Faster ordering, fewer mistakes</span>
                 </li>
-                <li className="flex items-start gap-2 sm:gap-3">
+                <li className="hidden md:flex items-start gap-2 sm:gap-3">
                   <svg
                     className="w-4 h-4 sm:w-5 sm:h-5 text-[#22C55E] flex-shrink-0 mt-0.5"
                     fill="none"
@@ -138,7 +163,7 @@ export default function Home() {
                   </svg>
                   <span className="text-xs sm:text-sm lg:text-base text-gray-100">Easy menu & stock updates</span>
                 </li>
-                <li className="flex items-start gap-2 sm:gap-3">
+                <li className="hidden md:flex items-start gap-2 sm:gap-3">
                   <svg
                     className="w-4 h-4 sm:w-5 sm:h-5 text-[#22C55E] flex-shrink-0 mt-0.5"
                     fill="none"
@@ -155,7 +180,7 @@ export default function Home() {
                   </svg>
                   <span className="text-xs sm:text-sm lg:text-base text-gray-100">Live orders and sales analytics</span>
                 </li>
-                <li className="flex items-start gap-2 sm:gap-3">
+                <li className="hidden lg:flex items-start gap-2 sm:gap-3">
                   <svg
                     className="w-4 h-4 sm:w-5 sm:h-5 text-[#22C55E] flex-shrink-0 mt-0.5"
                     fill="none"
@@ -173,35 +198,10 @@ export default function Home() {
                   <span className="text-xs sm:text-sm lg:text-base text-gray-100">No app required for customers</span>
                 </li>
               </ul>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center lg:justify-start">
-                <a
-                  href="/owner/login"
-                  className="bg-[#22C55E] text-white px-5 sm:px-6 lg:px-8 py-2.5 sm:py-3 rounded-full font-semibold text-sm sm:text-base transition-all duration-200 hover:bg-[#16A34A] hover:shadow-lg text-center"
-                >
-                  Get Started
-                </a>
-                <a
-                  href="/contact"
-                  className="border-2 border-white text-white px-5 sm:px-6 lg:px-8 py-2.5 sm:py-3 rounded-full font-semibold text-sm sm:text-base transition-all duration-200 hover:bg-white hover:text-[#0F172A] text-center"
-                >
-                  Book Free Demo
-                </a>
-                <a
-                  href="/track-order"
-                  className="bg-white bg-opacity-20 backdrop-blur-sm text-white px-5 sm:px-6 lg:px-8 py-2.5 sm:py-3 rounded-full font-semibold text-sm sm:text-base transition-all duration-200 hover:bg-opacity-30 hover:shadow-lg text-center flex items-center justify-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Track Order
-                </a>
-              </div>
             </div>
 
-            {/* Right Side - Mobile Mockup */}
-            <div className="flex justify-center lg:justify-end order-first lg:order-last mt-4 lg:mt-0">
+            {/* Right Side - Mobile Mockup - Hidden on mobile, shown on md+ */}
+            <div className="flex justify-center lg:justify-end order-2 mb-4 lg:mb-0 hidden md:flex">
               <div className="relative w-full max-w-[160px] sm:max-w-[200px] md:max-w-[240px] lg:max-w-[280px]">
                 {/* Mobile Frame */}
                 <div className="relative bg-white rounded-[2rem] sm:rounded-[2.5rem] p-1.5 sm:p-2 shadow-2xl">
