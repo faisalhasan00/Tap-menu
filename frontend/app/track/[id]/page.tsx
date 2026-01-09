@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { orderService, Order } from '@/services/orderService';
 import PublicLayout from '@/components/layouts/PublicLayout';
@@ -93,16 +93,83 @@ function TrackOrderContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [isPolling, setIsPolling] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date()); // For real-time timestamp updates
 
   const orderId = params?.id as string;
 
   // ============================================
-  // PART 1: FIX BLINKING ISSUE
+  // POLLING IMPLEMENTATION
   // ============================================
-  // PROBLEM: Having 'order' in dependency array causes infinite loop
-  // SOLUTION: Only depend on 'orderId', separate interval logic
-  
-  // Effect 1: Fetch order when trackingId changes
+  // Reusable fetch function for both initial load and polling
+  // Using useCallback to prevent unnecessary re-renders
+  const fetchOrder = useCallback(async (isPollingCall = false) => {
+    if (!orderId) return;
+
+    try {
+      if (!isPollingCall) {
+        console.log('📡 [TRACK_PAGE] Initial fetch - order identifier:', orderId);
+        setLoading(true);
+      } else {
+        console.log('🔄 [TRACK_PAGE] Polling - fetching order update');
+      }
+      
+      // Don't clear error on polling calls (only on initial load)
+      if (!isPollingCall) {
+        setError('');
+      }
+      
+      // Use orderId directly (Next.js already decoded it)
+      const response = await orderService.getOrderByTrackingId(orderId);
+      console.log('✅ [TRACK_PAGE] Order fetched successfully:', {
+        orderId: response.data._id,
+        trackingNumber: response.data.trackingNumber,
+        trackingId: response.data.trackingId,
+        status: response.data.status,
+        isPolling: isPollingCall
+      });
+      
+      // Update order state
+      setOrder(response.data);
+      setLastUpdated(new Date());
+      
+      // Calculate time remaining if order is not ready/rejected
+      if (response.data.status !== 'READY' && response.data.status !== 'REJECTED') {
+        const orderDate = new Date(response.data.createdAt);
+        const estimatedMinutes = response.data.estimatedTime || 15;
+        const estimatedCompletion = new Date(orderDate.getTime() + estimatedMinutes * 60000);
+        const now = new Date();
+        const remaining = Math.max(0, Math.ceil((estimatedCompletion.getTime() - now.getTime()) / 60000));
+        setTimeRemaining(remaining);
+      } else {
+        setTimeRemaining(null);
+      }
+    } catch (err: any) {
+      console.error('❌ [TRACK_PAGE] Error fetching order:', err);
+      console.error('❌ [TRACK_PAGE] Error details:', {
+        message: err.message,
+        trackingId: orderId,
+        error: err,
+        isPolling: isPollingCall
+      });
+      
+      // Only set error on initial load, not on polling failures
+      // Polling will retry on next interval
+      if (!isPollingCall) {
+        setError(err.message || 'Order not found. Please check your tracking number or order ID.');
+        setOrder(null);
+        setTimeRemaining(null);
+      }
+    } finally {
+      if (!isPollingCall) {
+        setLoading(false);
+      }
+      console.log('🏁 [TRACK_PAGE] Fetch completed', { isPolling: isPollingCall });
+    }
+  }, [orderId]);
+
+  // Effect 1: Initial fetch when trackingId changes
   useEffect(() => {
     console.log('🔄 [TRACK_PAGE] Component mounted/updated');
     console.log('🔄 [TRACK_PAGE] Route params:', params);
@@ -116,63 +183,75 @@ function TrackOrderContent() {
       setError('Invalid tracking ID or order number');
       setLoading(false);
       setOrder(null);
+      setIsPolling(false);
       return;
     }
 
     // Next.js automatically decodes route parameters
     console.log('🔄 [TRACK_PAGE] Tracking identifier (ready for API):', orderId);
 
-    const fetchOrder = async () => {
-      try {
-        console.log('📡 [TRACK_PAGE] Fetching order with identifier:', orderId);
-        setLoading(true);
-        setError('');
-        
-        // Use orderId directly (Next.js already decoded it)
-        const response = await orderService.getOrderByTrackingId(orderId);
-        console.log('✅ [TRACK_PAGE] Order fetched successfully:', {
-          orderId: response.data._id,
-          trackingNumber: response.data.trackingNumber,
-          trackingId: response.data.trackingId,
-          status: response.data.status
-        });
-        
-        setOrder(response.data);
-        
-        // Calculate time remaining if order is not ready/rejected
-        if (response.data.status !== 'READY' && response.data.status !== 'REJECTED') {
-          const orderDate = new Date(response.data.createdAt);
-          const estimatedMinutes = response.data.estimatedTime || 15;
-          const estimatedCompletion = new Date(orderDate.getTime() + estimatedMinutes * 60000);
-          const now = new Date();
-          const remaining = Math.max(0, Math.ceil((estimatedCompletion.getTime() - now.getTime()) / 60000));
-          setTimeRemaining(remaining);
-        } else {
-          setTimeRemaining(null);
-        }
-      } catch (err: any) {
-        console.error('❌ [TRACK_PAGE] Error fetching order:', err);
-        console.error('❌ [TRACK_PAGE] Error details:', {
-          message: err.message,
-          trackingId: orderId,
-          error: err
-        });
-        setError(err.message || 'Order not found. Please check your tracking number or order ID.');
-        setOrder(null);
-        setTimeRemaining(null);
-      } finally {
-        setLoading(false);
-        console.log('🏁 [TRACK_PAGE] Fetch completed');
-      }
-    };
-
-    fetchOrder();
+    // Initial fetch
+    fetchOrder(false);
     
     // ============================================
-    // CRITICAL: Only depend on orderId, NOT order
+    // CRITICAL: Only depend on orderId and fetchOrder
     // This prevents infinite re-render loop
     // ============================================
-  }, [orderId, params]);
+  }, [orderId, params, fetchOrder]);
+
+  // Effect 2: Set up polling interval
+  useEffect(() => {
+    // ============================================
+    // POLLING RULES:
+    // 1. Poll ONLY when trackingId exists
+    // 2. Poll every 5 seconds
+    // 3. Stop when order is READY or REJECTED
+    // 4. Clear interval on unmount
+    // 5. Do NOT create multiple intervals
+    // ============================================
+    
+    if (!orderId) {
+      setIsPolling(false);
+      return;
+    }
+
+    // Don't start polling if still loading initial data
+    if (loading) {
+      return;
+    }
+
+    // Check if order is in final state (stop polling)
+    if (order && (order.status === 'READY' || order.status === 'REJECTED')) {
+      console.log('🛑 [TRACK_PAGE] Order in final state, stopping polling:', order.status);
+      setIsPolling(false);
+      return;
+    }
+
+    // If there's an error and no order, don't poll
+    if (error && !order) {
+      console.log('🛑 [TRACK_PAGE] Error state, not polling');
+      setIsPolling(false);
+      return;
+    }
+
+    // Start polling if order exists and is not in final state
+    if (order && order.status !== 'READY' && order.status !== 'REJECTED') {
+      console.log('🔄 [TRACK_PAGE] Starting polling interval');
+      setIsPolling(true);
+
+      // Poll every 5 seconds
+      const pollInterval = setInterval(() => {
+        console.log('⏰ [TRACK_PAGE] Polling interval triggered');
+        fetchOrder(true);
+      }, 5000); // 5 seconds
+
+      return () => {
+        console.log('🛑 [TRACK_PAGE] Cleaning up polling interval');
+        clearInterval(pollInterval);
+        setIsPolling(false);
+      };
+    }
+  }, [orderId, order, loading, error, fetchOrder]);
 
   // Effect 2: Update time remaining every minute (separate from fetch)
   useEffect(() => {
@@ -198,6 +277,17 @@ function TrackOrderContent() {
 
     return () => clearInterval(interval);
   }, [order]);
+
+  // Effect 3: Update current time every second for real-time "last updated" display
+  useEffect(() => {
+    if (!lastUpdated) return;
+
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000); // Update every second
+
+    return () => clearInterval(interval);
+  }, [lastUpdated]);
 
   const restaurantName = order?.restaurantId && typeof order.restaurantId === 'object' 
     ? order.restaurantId.name 
@@ -241,6 +331,23 @@ function TrackOrderContent() {
       return `${hours} hour${hours !== 1 ? 's' : ''} remaining`;
     }
     return `${hours}h ${remainingMinutes}m remaining`;
+  };
+
+  const formatLastUpdated = (date: Date): string => {
+    // Use currentTime state for real-time updates
+    const diffInSeconds = Math.floor((currentTime.getTime() - date.getTime()) / 1000);
+    
+    if (diffInSeconds < 5) {
+      return 'just now';
+    } else if (diffInSeconds < 60) {
+      return `${diffInSeconds} second${diffInSeconds !== 1 ? 's' : ''} ago`;
+    } else if (diffInSeconds < 3600) {
+      const minutes = Math.floor(diffInSeconds / 60);
+      return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+    } else {
+      const hours = Math.floor(diffInSeconds / 3600);
+      return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+    }
   };
 
   const handleDownloadInvoice = async () => {
@@ -373,7 +480,19 @@ function TrackOrderContent() {
               </Button>
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold text-[#0F172A] mb-2">Track Your Order</h1>
-            <p className="text-gray-600">Tracking Number: <span className="font-semibold text-[#22C55E]">{trackingNumber}</span></p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <p className="text-gray-600">
+                Tracking Number: <span className="font-semibold text-[#22C55E]">{trackingNumber}</span>
+              </p>
+              {lastUpdated && (
+                <p className="text-sm text-gray-500 flex items-center gap-1">
+                  {isPolling && (
+                    <span className="inline-block w-2 h-2 bg-[#22C55E] rounded-full animate-pulse"></span>
+                  )}
+                  Last updated: {formatLastUpdated(lastUpdated)}
+                </p>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
