@@ -374,22 +374,22 @@ function TrackOrderContent() {
   if (!orderId) {
     return (
       <PublicLayout>
-        <div className="min-h-screen bg-[#F8FAFC] py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-[#F8FAFC] py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
-              <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-10 h-10 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-6 sm:p-8 text-center">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                <svg className="w-8 h-8 sm:w-10 sm:h-10 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              <h1 className="text-2xl font-bold text-[#0F172A] mb-3">Tracking ID Required</h1>
-              <p className="text-gray-600 mb-6">
+              <h1 className="text-xl sm:text-2xl font-bold text-[#0F172A] mb-2 sm:mb-3 leading-tight">Tracking ID Required</h1>
+              <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 px-2 leading-relaxed">
                 Please provide a tracking ID or order number to view your order status.
               </p>
               <Button
                 onClick={() => router.push('/track')}
                 variant="primary"
-                className="w-full sm:w-auto"
+                className="w-full sm:w-auto min-h-[44px]"
               >
                 Enter Tracking ID
               </Button>
@@ -417,28 +417,28 @@ function TrackOrderContent() {
   if (error || !order) {
     return (
       <PublicLayout>
-        <div className="min-h-screen bg-[#F8FAFC] py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-[#F8FAFC] py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
-              <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-6 sm:p-8 text-center">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                <svg className="w-8 h-8 sm:w-10 sm:h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </div>
-              <h1 className="text-2xl font-bold text-[#0F172A] mb-3">Order Not Found</h1>
-              <p className="text-gray-600 mb-6">{error || 'The order you are looking for could not be found.'}</p>
-              <div className="space-y-3">
+              <h1 className="text-xl sm:text-2xl font-bold text-[#0F172A] mb-2 sm:mb-3 leading-tight">Order Not Found</h1>
+              <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 px-2 leading-relaxed">{error || 'The order you are looking for could not be found.'}</p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button
                   onClick={() => router.push('/track-order')}
                   variant="primary"
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto min-h-[44px]"
                 >
                   Search Another Order
                 </Button>
                 <Button
                   onClick={() => router.push('/')}
                   variant="secondary"
-                  className="w-full sm:w-auto sm:ml-3"
+                  className="w-full sm:w-auto min-h-[44px]"
                 >
                   Back to Home
                 </Button>
@@ -452,16 +452,16 @@ function TrackOrderContent() {
 
   return (
     <PublicLayout>
-      <div className="min-h-screen bg-[#F8FAFC] py-8 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-[#F8FAFC] py-4 sm:py-6 lg:py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="mb-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+          <div className="mb-4 sm:mb-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4">
               <button
                 onClick={() => router.push('/track-order')}
-                className="text-[#22C55E] hover:text-[#16A34A] font-semibold flex items-center gap-2 transition-colors"
+                className="text-[#22C55E] hover:text-[#16A34A] font-semibold flex items-center gap-2 transition-colors text-sm sm:text-base self-start"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
                 Back to Search
@@ -469,23 +469,23 @@ function TrackOrderContent() {
               <Button
                 onClick={handleDownloadInvoice}
                 variant="primary"
-                className="w-full sm:w-auto"
+                className="w-full sm:w-auto min-h-[44px]"
               >
-                <span className="flex items-center gap-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   Download Invoice
                 </span>
               </Button>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-[#0F172A] mb-2">Track Your Order</h1>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <p className="text-gray-600">
-                Tracking Number: <span className="font-semibold text-[#22C55E]">{trackingNumber}</span>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#0F172A] mb-2 leading-tight">Track Your Order</h1>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm sm:text-base text-gray-600 break-words">
+                Tracking Number: <span className="font-semibold text-[#22C55E] break-all">{trackingNumber}</span>
               </p>
               {lastUpdated && (
-                <p className="text-sm text-gray-500 flex items-center gap-1">
+                <p className="text-xs sm:text-sm text-gray-500 flex items-center gap-1">
                   {isPolling && (
                     <span className="inline-block w-2 h-2 bg-[#22C55E] rounded-full animate-pulse"></span>
                   )}
@@ -495,44 +495,44 @@ function TrackOrderContent() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             {/* Main Content - Status Timeline */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-4 sm:space-y-6">
               {/* Status Card */}
-              <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-[#0F172A]">Order Status</h2>
-                  <span className={`px-4 py-2 rounded-full text-sm font-semibold border-2 ${getStatusColor(order.status)}`}>
+              <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
+                  <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A]">Order Status</h2>
+                  <span className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold border-2 ${getStatusColor(order.status)} self-start sm:self-auto`}>
                     {getStatusText(order.status)}
                   </span>
                 </div>
 
                 {/* Time Remaining */}
                 {timeRemaining !== null && order.status !== 'REJECTED' && (
-                  <div className="bg-[#22C55E] bg-opacity-10 border-2 border-[#22C55E] rounded-xl p-4 mb-6">
-                    <div className="flex items-center gap-3">
-                      <svg className="w-6 h-6 text-[#22C55E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="bg-[#22C55E] bg-opacity-10 border-2 border-[#22C55E] rounded-lg sm:rounded-xl p-3 sm:p-4 mb-4 sm:mb-6">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[#22C55E] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <div>
-                        <p className="text-sm text-gray-600">Estimated Time Remaining</p>
-                        <p className="text-xl font-bold text-[#22C55E]">{formatTimeRemaining(timeRemaining)}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs sm:text-sm text-gray-600">Estimated Time Remaining</p>
+                        <p className="text-lg sm:text-xl font-bold text-[#22C55E] break-words">{formatTimeRemaining(timeRemaining)}</p>
                       </div>
                     </div>
                   </div>
                 )}
 
                 {/* Status Timeline */}
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-6">
                   {statusTimeline.map((step, index) => {
                     const isStepActive = step.isActive || step.isCompleted;
                     const isLast = index === statusTimeline.length - 1;
 
                     return (
-                      <div key={step.status} className="flex gap-4">
+                      <div key={step.status} className="flex gap-3 sm:gap-4">
                         {/* Timeline Line */}
-                        <div className="flex flex-col items-center">
-                          <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 ${
+                        <div className="flex flex-col items-center flex-shrink-0">
+                          <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center border-2 ${
                             step.isCompleted 
                               ? 'bg-[#22C55E] border-[#22C55E]' 
                               : step.isActive 
@@ -544,18 +544,18 @@ function TrackOrderContent() {
                           {!isLast && (
                             <div className={`w-0.5 flex-1 mt-2 ${
                               step.isCompleted ? 'bg-[#22C55E]' : 'bg-gray-200'
-                            }`} style={{ minHeight: '60px' }}></div>
+                            }`} style={{ minHeight: '50px' }}></div>
                           )}
                         </div>
 
                         {/* Timeline Content */}
-                        <div className="flex-1 pb-6">
-                          <h3 className={`text-lg font-semibold mb-1 ${
+                        <div className="flex-1 pb-4 sm:pb-6 min-w-0">
+                          <h3 className={`text-base sm:text-lg font-semibold mb-1 leading-tight ${
                             isStepActive ? 'text-[#0F172A]' : 'text-gray-400'
                           }`}>
                             {step.label}
                           </h3>
-                          <p className={`text-sm ${
+                          <p className={`text-xs sm:text-sm leading-relaxed ${
                             isStepActive ? 'text-gray-600' : 'text-gray-400'
                           }`}>
                             {step.description}
@@ -569,33 +569,33 @@ function TrackOrderContent() {
             </div>
 
             {/* Sidebar - Order Details */}
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {/* Order Info Card */}
-              <div className="bg-white rounded-2xl shadow-lg p-6">
-                <h3 className="text-xl font-bold text-[#0F172A] mb-4">Order Details</h3>
-                <div className="space-y-4">
+              <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6">
+                <h3 className="text-lg sm:text-xl font-bold text-[#0F172A] mb-3 sm:mb-4">Order Details</h3>
+                <div className="space-y-3 sm:space-y-4">
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Restaurant</p>
-                    <p className="font-semibold text-[#0F172A]">{restaurantName}</p>
+                    <p className="text-xs sm:text-sm text-gray-600 mb-1">Restaurant</p>
+                    <p className="text-sm sm:text-base font-semibold text-[#0F172A] break-words">{restaurantName}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Table Number</p>
-                    <p className="font-semibold text-[#0F172A]">Table {order.tableNumber}</p>
+                    <p className="text-xs sm:text-sm text-gray-600 mb-1">Table Number</p>
+                    <p className="text-sm sm:text-base font-semibold text-[#0F172A]">Table {order.tableNumber}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Tracking Number</p>
-                    <p className="font-semibold text-[#22C55E]">{trackingNumber}</p>
+                    <p className="text-xs sm:text-sm text-gray-600 mb-1">Tracking Number</p>
+                    <p className="text-sm sm:text-base font-semibold text-[#22C55E] break-all">{trackingNumber}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Order Date</p>
-                    <p className="font-semibold text-[#0F172A]">
+                    <p className="text-xs sm:text-sm text-gray-600 mb-1">Order Date</p>
+                    <p className="text-sm sm:text-base font-semibold text-[#0F172A] break-words">
                       {new Date(order.createdAt).toLocaleString()}
                     </p>
                   </div>
                   {order.estimatedTime && (
                     <div>
-                      <p className="text-sm text-gray-600 mb-1">Estimated Preparation</p>
-                      <p className="font-semibold text-[#0F172A]">
+                      <p className="text-xs sm:text-sm text-gray-600 mb-1">Estimated Preparation</p>
+                      <p className="text-sm sm:text-base font-semibold text-[#0F172A]">
                         {order.estimatedTime} minute{order.estimatedTime !== 1 ? 's' : ''}
                       </p>
                     </div>
@@ -604,27 +604,27 @@ function TrackOrderContent() {
               </div>
 
               {/* Order Summary Card */}
-              <div className="bg-white rounded-2xl shadow-lg p-6">
-                <h3 className="text-xl font-bold text-[#0F172A] mb-4">Order Summary</h3>
-                <div className="space-y-3 mb-4">
+              <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6">
+                <h3 className="text-lg sm:text-xl font-bold text-[#0F172A] mb-3 sm:mb-4">Order Summary</h3>
+                <div className="space-y-2 sm:space-y-3 mb-3 sm:mb-4">
                   {order.items.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                      <div className="flex-1">
-                        <p className="font-medium text-[#0F172A]">{item.name}</p>
-                        <p className="text-sm text-gray-600">
+                    <div key={index} className="flex items-start sm:items-center justify-between gap-2 py-2 border-b border-gray-100 last:border-0">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm sm:text-base font-medium text-[#0F172A] break-words">{item.name}</p>
+                        <p className="text-xs sm:text-sm text-gray-600">
                           ₹{item.price.toFixed(2)} × {item.quantity}
                         </p>
                       </div>
-                      <p className="font-semibold text-[#0F172A]">
+                      <p className="text-sm sm:text-base font-semibold text-[#0F172A] flex-shrink-0">
                         ₹{(item.price * item.quantity).toFixed(2)}
                       </p>
                     </div>
                   ))}
                 </div>
-                <div className="border-t-2 border-gray-200 pt-4">
+                <div className="border-t-2 border-gray-200 pt-3 sm:pt-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-lg font-semibold text-[#0F172A]">Total</span>
-                    <span className="text-2xl font-bold text-[#22C55E]">
+                    <span className="text-base sm:text-lg font-semibold text-[#0F172A]">Total</span>
+                    <span className="text-xl sm:text-2xl font-bold text-[#22C55E]">
                       ₹{order.totalAmount.toFixed(2)}
                     </span>
                   </div>
