@@ -207,26 +207,13 @@ export default function Home() {
                 <div className="relative bg-white rounded-[2rem] sm:rounded-[2.5rem] p-1.5 sm:p-2 shadow-2xl">
                   <div className="bg-gray-900 rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden">
                     {/* Mobile Screen Content */}
-                    <div className="aspect-[9/19] bg-gradient-to-br from-[#F8FAFC] to-white flex items-center justify-center">
-                      {/* Placeholder for mobile app mockup */}
-                      <div className="text-center p-3 sm:p-4 lg:p-6">
-                        <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 mx-auto mb-2 sm:mb-3 bg-[#22C55E] bg-opacity-10 rounded-xl sm:rounded-2xl flex items-center justify-center">
-                          <svg
-                            className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-[#22C55E]"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
-                            />
-                          </svg>
-                        </div>
-                        <p className="text-[10px] sm:text-xs text-gray-500 font-medium">TapMenu</p>
-                      </div>
+                    <div className="aspect-[9/19] bg-gradient-to-br from-[#F8FAFC] to-white flex items-center justify-center overflow-hidden">
+                      {/* TapMenu UI Image */}
+                      <img
+                        src="/image/TapMenu_UI-removebg-preview.png"
+                        alt="TapMenu Mobile App Interface"
+                        className="w-full h-full object-contain"
+                      />
                     </div>
                   </div>
                 </div>
