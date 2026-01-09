@@ -63,7 +63,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <header className="relative min-h-[70vh] md:min-h-[75vh] lg:min-h-[80vh] flex items-center overflow-hidden">
+      <header className="relative min-h-[60vh] sm:min-h-[65vh] md:min-h-[75vh] lg:min-h-[80vh] flex items-center overflow-hidden">
         {/* Background Image with Overlay */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -75,39 +75,34 @@ export default function Home() {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 md:py-12 lg:py-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-10 items-center">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 md:py-12 lg:py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-6 lg:gap-10 items-center">
             {/* Left Side - Text Content */}
             <div className="text-white text-center lg:text-left order-1">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 md:mb-4 leading-tight">
-                QR Menu for Restaurants: Digital Menu & Table Ordering System
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 md:mb-4 leading-[1.3] sm:leading-tight">
+                <span className="block">QR Menu for</span>
+                <span className="block sm:inline sm:ml-1">Restaurants</span>
+                <span className="block text-base sm:text-xl md:text-2xl lg:text-3xl font-semibold mt-2 sm:mt-2 md:mt-3 opacity-90 leading-tight">
+                  Digital Menu & Ordering
+                </span>
               </h1>
-              <p className="text-sm sm:text-base lg:text-lg text-gray-200 mb-3 sm:mb-4 md:mb-6 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+              <p className="text-sm sm:text-base lg:text-lg text-gray-200 mb-5 sm:mb-5 md:mb-6 leading-relaxed max-w-2xl mx-auto lg:mx-0 mt-3 sm:mt-3 px-1 sm:px-0">
                 Let customers order from their table while you manage everything from one dashboard.
               </p>
 
-              {/* CTA Buttons - Moved up for mobile visibility */}
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center lg:justify-start mb-4 sm:mb-5 md:mb-6">
+              {/* CTA Buttons - Primary actions on mobile */}
+              <div className="flex flex-col gap-3 sm:flex-row sm:gap-3 justify-center lg:justify-start mb-0 sm:mb-5 md:mb-6">
                 <a
                   href="/owner/login"
-                  className="bg-[#22C55E] text-white px-5 sm:px-6 lg:px-8 py-3 sm:py-3 rounded-full font-semibold text-sm sm:text-base transition-all duration-200 hover:bg-[#16A34A] hover:shadow-lg text-center min-h-[44px] flex items-center justify-center"
+                  className="bg-[#22C55E] text-white px-8 sm:px-6 lg:px-8 py-4 rounded-full font-semibold text-base transition-all duration-200 hover:bg-[#16A34A] hover:shadow-lg text-center min-h-[52px] flex items-center justify-center shadow-lg"
                 >
                   Get Started
                 </a>
-                <WhatsAppButton variant="inline" />
-                <a
-                  href="/track-order"
-                  className="bg-white bg-opacity-20 backdrop-blur-sm text-white px-5 sm:px-6 lg:px-8 py-3 sm:py-3 rounded-full font-semibold text-sm sm:text-base transition-all duration-200 hover:bg-opacity-30 hover:shadow-lg text-center flex items-center justify-center gap-2 min-h-[44px]"
-                >
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Track Order
-                </a>
+                <WhatsAppButton variant="inline" className="min-h-[52px]" />
               </div>
 
-              {/* Benefit Bullet Points - Limited on mobile */}
-              <ul className="space-y-2 sm:space-y-3 max-w-xl mx-auto lg:mx-0">
+              {/* Benefit Bullet Points - Show only 1 on mobile */}
+              <ul className="space-y-2 sm:space-y-2.5 max-w-xl mx-auto lg:mx-0 hidden sm:block md:block">
                 <li className="flex items-start gap-2 sm:gap-3">
                   <svg
                     className="w-4 h-4 sm:w-5 sm:h-5 text-[#22C55E] flex-shrink-0 mt-0.5"
