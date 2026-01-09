@@ -36,6 +36,9 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string>('');
 
+  // Debug log for component lifecycle
+  console.log('🔄 [CHECKOUT_MODAL] Render', { isOpen, itemsCount: items.length });
+
 
   const handleCheckout = async () => {
     console.log('🛒 [CHECKOUT] handleCheckout called', { itemsCount: items.length, items });
@@ -115,15 +118,27 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({
       // Reset processing state
       setIsProcessing(false);
 
-      // IMPORTANT: Notify parent FIRST with order data
-      // This ensures parent state is updated before modal closes
+      // ============================================
+      // STEP 4: CHECKOUTMODAL RESPONSIBILITY
+      // ============================================
+      // CheckoutModal MUST:
+      // - Only place the order
+      // - On success, call onOrderSuccess callback
+      // - NOT render success UI
+      // - NOT reset state
+      // - NOT close the page itself
+      console.log('✅ [CHECKOUT] Calling onOrderSuccess callback with data:', successData);
       if (onOrderSuccess) {
         onOrderSuccess(successData);
+        console.log('✅ [CHECKOUT] onOrderSuccess callback executed');
+      } else {
+        console.warn('⚠️ [CHECKOUT] onOrderSuccess callback not provided!');
       }
 
       // Close the checkout modal
-      // Parent will handle closing based on state updates
+      // Parent will handle showing success screen based on state updates
       onClose();
+      console.log('✅ [CHECKOUT] Checkout modal closed');
 
       console.log('✅ [CHECKOUT] Order created successfully:', {
         orderId,

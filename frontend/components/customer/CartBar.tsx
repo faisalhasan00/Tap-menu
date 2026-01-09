@@ -3,36 +3,44 @@
 import { useState } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import CheckoutModal from './CheckoutModal';
-import OrderSuccessScreen from './OrderSuccessScreen';
+
+// Order success data type (must match page component)
+export type OrderSuccessData = {
+  restaurantName: string;
+  orderId: string;
+  trackingId: string;
+  trackingNumber?: string;
+  tableNumber: number;
+  items: Array<{ name: string; price: number; quantity: number }>;
+  totalAmount: number;
+  orderDate: string;
+  estimatedTime: number;
+};
 
 interface CartBarProps {
   restaurantId?: string;
   restaurantName?: string;
   tableNumber?: number;
+  onOrderSuccess?: (orderData: OrderSuccessData) => void;
 }
 
 const CartBar: React.FC<CartBarProps> = ({ 
   restaurantId, 
   restaurantName = 'Restaurant',
-  tableNumber 
+  tableNumber,
+  onOrderSuccess
 }) => {
   const { items, totalItems, totalPrice, updateQuantity, removeFromCart, clearCart } = useCart();
   
-  // State management following production architecture
+  // ============================================
+  // STEP 4: CARTBAR RESPONSIBILITY
+  // ============================================
+  // CartBar ONLY manages:
+  // - Cart modal visibility
+  // - Checkout modal visibility
+  // Order success state is managed by parent page component
   const [isOpen, setIsOpen] = useState(false); // Cart modal state
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false); // Checkout modal state
-  const [orderSuccess, setOrderSuccess] = useState(false); // Order success state
-  const [orderData, setOrderData] = useState<{
-    restaurantName: string;
-    orderId: string;
-    trackingId: string;
-    trackingNumber?: string;
-    tableNumber: number;
-    items: Array<{ name: string; price: number; quantity: number }>;
-    totalAmount: number;
-    orderDate: string;
-    estimatedTime: number;
-  } | null>(null);
 
   if (totalItems === 0) {
     return null;
@@ -165,44 +173,34 @@ const CartBar: React.FC<CartBarProps> = ({
         </div>
       )}
 
-      {/* Checkout Modal - Only render when checkout is open AND order is not successful */}
-      {restaurantId && tableNumber && isCheckoutOpen && !orderSuccess && (
+      {/* ============================================
+          STEP 4: CHECKOUTMODAL RESPONSIBILITY
+          ============================================
+          CheckoutModal:
+          - Only places the order
+          - On success, calls onOrderSuccess callback
+          - Does NOT render success UI
+          - Does NOT manage success state
+      */}
+      {restaurantId && tableNumber && isCheckoutOpen && (
         <CheckoutModal
           isOpen={isCheckoutOpen}
           onClose={() => {
+            console.log('🔄 [CART_BAR] Closing checkout modal');
             setIsCheckoutOpen(false);
           }}
           restaurantId={restaurantId}
           restaurantName={restaurantName}
           tableNumber={tableNumber}
           onOrderSuccess={(orderData) => {
-            console.log('🎉 [CART_BAR] Order success callback received:', orderData);
-            // Set order data
-            setOrderData(orderData);
-            // Set order success state
-            setOrderSuccess(true);
-            // Close checkout modal safely
+            console.log('🎉 [CART_BAR] Order success callback received, forwarding to parent:', orderData);
+            // Forward to parent page component
+            if (onOrderSuccess) {
+              onOrderSuccess(orderData);
+            }
+            // Close checkout modal
             setIsCheckoutOpen(false);
-            console.log('🎉 [CART_BAR] Order success state set, modal closed');
-          }}
-        />
-      )}
-
-      {/* Order Success Screen - Rendered OUTSIDE of CheckoutModal */}
-      {orderSuccess && orderData && (
-        <OrderSuccessScreen
-          restaurantName={orderData.restaurantName}
-          orderId={orderData.orderId}
-          trackingId={orderData.trackingId}
-          trackingNumber={orderData.trackingNumber}
-          tableNumber={orderData.tableNumber}
-          items={orderData.items}
-          totalAmount={orderData.totalAmount}
-          orderDate={orderData.orderDate}
-          estimatedTime={orderData.estimatedTime}
-          onClose={() => {
-            setOrderSuccess(false);
-            setOrderData(null);
+            console.log('🎉 [CART_BAR] Checkout modal closed, parent notified');
           }}
         />
       )}

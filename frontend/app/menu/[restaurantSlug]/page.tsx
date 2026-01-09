@@ -6,7 +6,9 @@ import { CartProvider } from '@/contexts/CartContext';
 import CategoryTabs from '@/components/customer/CategoryTabs';
 import CustomerMenuItemCard from '@/components/customer/CustomerMenuItemCard';
 import CartBar from '@/components/customer/CartBar';
+import OrderSuccessScreen from '@/components/customer/OrderSuccessScreen';
 import { customerMenuService, CustomerCategory, CustomerMenuItem, CustomerRestaurant } from '@/services/customerMenuService';
+import type { OrderSuccessData } from '@/components/customer/CartBar';
 
 function MenuContent() {
   const params = useParams();
@@ -20,6 +22,14 @@ function MenuContent() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>('');
+  
+  // ============================================
+  // STEP 2: ORDER SUCCESS STATE AT TOP LEVEL
+  // ============================================
+  // These states MUST live in the page component, NOT in CartBar
+  // This ensures they persist even when CartBar unmounts
+  const [orderSuccess, setOrderSuccess] = useState(false);
+  const [orderData, setOrderData] = useState<OrderSuccessData | null>(null);
 
   useEffect(() => {
     const loadMenu = async () => {
@@ -109,6 +119,65 @@ function MenuContent() {
 
   const availableItems = filteredItems.filter((item) => item.isAvailable);
 
+  // ============================================
+  // STEP 3: ENFORCE STRICT RENDER LOGIC
+  // ============================================
+  // IF orderSuccess === true:
+  //   - DO NOT render menu
+  //   - DO NOT render CartBar
+  //   - Render OrderSuccessScreen ONLY
+  // IF orderSuccess === false:
+  //   - Show menu
+  //   - Show CartBar (if tableNumber exists)
+  
+  // Debug log to trace render lifecycle
+  console.log('🔥 [PAGE] RENDER', {
+    orderSuccess,
+    orderDataPresent: !!orderData,
+    tableNumber,
+    restaurantName: restaurant?.name
+  });
+
+  // Handle order success callback
+  const handleOrderSuccess = (data: OrderSuccessData) => {
+    console.log('🎉 [PAGE] Order success callback received:', data);
+    setOrderData(data);
+    setOrderSuccess(true);
+    console.log('🎉 [PAGE] Order success state set to true');
+  };
+
+  // Handle closing order success screen
+  const handleCloseOrderSuccess = () => {
+    console.log('🔄 [PAGE] Closing order success screen');
+    setOrderSuccess(false);
+    setOrderData(null);
+  };
+
+  // ============================================
+  // RENDER: Order Success Screen (Priority)
+  // ============================================
+  if (orderSuccess && orderData) {
+    console.log('✅ [PAGE] Rendering OrderSuccessScreen');
+    return (
+      <OrderSuccessScreen
+        restaurantName={orderData.restaurantName}
+        orderId={orderData.orderId}
+        trackingId={orderData.trackingId}
+        trackingNumber={orderData.trackingNumber}
+        tableNumber={orderData.tableNumber}
+        items={orderData.items}
+        totalAmount={orderData.totalAmount}
+        orderDate={orderData.orderDate}
+        estimatedTime={orderData.estimatedTime}
+        onClose={handleCloseOrderSuccess}
+      />
+    );
+  }
+
+  // ============================================
+  // RENDER: Normal Menu View
+  // ============================================
+  console.log('📋 [PAGE] Rendering normal menu view');
   return (
     <div className="min-h-screen bg-white pb-20">
       {/* Header */}
@@ -166,12 +235,15 @@ function MenuContent() {
         )}
       </main>
 
-      {/* Sticky Cart Bar */}
-      <CartBar 
-        restaurantId={restaurant?._id}
-        restaurantName={restaurant?.name}
-        tableNumber={tableNumber}
-      />
+      {/* Sticky Cart Bar - Only render when orderSuccess is false */}
+      {tableNumber && !orderSuccess && (
+        <CartBar 
+          restaurantId={restaurant?._id}
+          restaurantName={restaurant?.name}
+          tableNumber={tableNumber}
+          onOrderSuccess={handleOrderSuccess}
+        />
+      )}
     </div>
   );
 }
