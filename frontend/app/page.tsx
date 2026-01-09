@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import WhatsAppButton from '@/components/ui/WhatsAppButton';
 
 export const metadata: Metadata = {
   title: 'QR Menu Restaurant Ordering System | TapMenu',
@@ -99,6 +100,7 @@ export default function Home() {
                 >
                   Book Free Demo
                 </a>
+                <WhatsAppButton variant="inline" />
                 <a
                   href="/track-order"
                   className="bg-white bg-opacity-20 backdrop-blur-sm text-white px-5 sm:px-6 lg:px-8 py-3 sm:py-3 rounded-full font-semibold text-sm sm:text-base transition-all duration-200 hover:bg-opacity-30 hover:shadow-lg text-center flex items-center justify-center gap-2 min-h-[44px]"

@@ -3,18 +3,20 @@
 import { usePathname } from 'next/navigation';
 import PublicNavbar from './PublicNavbar';
 import PublicFooter from './PublicFooter';
+import WhatsAppButton from '@/components/ui/WhatsAppButton';
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   // Define public routes (routes that should show the navbar and footer)
-  const publicRoutes = ['/', '/features', '/how-it-works', '/contact'];
-  const isPublicRoute = publicRoutes.some(route => {
-    if (route === '/') {
-      return pathname === '/';
-    }
-    return pathname.startsWith(route);
-  });
+  const isPublicRoute = 
+    pathname === '/' ||
+    pathname.startsWith('/features') ||
+    pathname.startsWith('/how-it-works') ||
+    pathname.startsWith('/contact') ||
+    pathname === '/track-order' ||
+    pathname === '/track' ||
+    pathname.startsWith('/track/');
 
   // Don't show navbar/footer on admin/owner/customer menu routes
   const hideNavbarRoutes = ['/super-admin', '/owner', '/r/', '/menu/'];
@@ -22,12 +24,17 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
 
   const showNavbar = isPublicRoute && !shouldHideNavbar;
   const showFooter = isPublicRoute && !shouldHideNavbar;
+  
+  // Show WhatsApp button on all public routes
+  const showWhatsApp = isPublicRoute;
 
   return (
     <>
       {showNavbar && <PublicNavbar />}
       {children}
       {showFooter && <PublicFooter />}
+      {/* Floating WhatsApp Button - Visible on all public pages */}
+      {showWhatsApp && <WhatsAppButton variant="floating" />}
     </>
   );
 }
