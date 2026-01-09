@@ -207,12 +207,12 @@ export default function Home() {
                 <div className="relative bg-white rounded-[2rem] sm:rounded-[2.5rem] p-1.5 sm:p-2 shadow-2xl">
                   <div className="bg-gray-900 rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden">
                     {/* Mobile Screen Content */}
-                    <div className="aspect-[9/19] bg-gradient-to-br from-[#F8FAFC] to-white flex items-center justify-center overflow-hidden">
+                    <div className="aspect-[9/19] bg-gradient-to-br from-[#F8FAFC] to-white overflow-hidden relative">
                       {/* TapMenu UI Image */}
                       <img
                         src="/image/TapMenu_UI-removebg-preview.png"
                         alt="TapMenu Mobile App Interface"
-                        className="w-full h-full object-contain"
+                        className="absolute inset-0 w-full h-full object-cover object-center"
                       />
                     </div>
                   </div>
