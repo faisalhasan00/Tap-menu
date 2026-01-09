@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import WhatsAppButton from '@/components/ui/WhatsAppButton';
 
 export const metadata: Metadata = {
@@ -63,143 +64,123 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <header className="relative min-h-[60vh] sm:min-h-[65vh] md:min-h-[75vh] lg:min-h-[80vh] flex items-center overflow-hidden">
-        {/* Background Image with Overlay */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: 'url(https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80)',
-          }}
-        >
-          <div className="absolute inset-0 bg-[#0F172A] opacity-65"></div>
+      <header className="relative bg-gradient-to-br from-[#0F172A] via-[#1E293B] to-[#0F172A] overflow-hidden">
+        {/* Subtle Pattern Overlay */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
+            backgroundSize: '24px 24px'
+          }}></div>
         </div>
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 md:py-12 lg:py-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-6 lg:gap-10 items-center">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10 md:pt-12 pb-10 sm:pb-12 md:pb-16 lg:pb-20">
+          <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 md:gap-10 lg:gap-12 items-center">
+            
             {/* Left Side - Text Content */}
-            <div className="text-white text-center lg:text-left order-1">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 md:mb-4 leading-[1.3] sm:leading-tight">
-                <span className="block">QR Menu for</span>
-                <span className="block sm:inline sm:ml-1">Restaurants</span>
-                <span className="block text-base sm:text-xl md:text-2xl lg:text-3xl font-semibold mt-2 sm:mt-2 md:mt-3 opacity-90 leading-tight">
-                  Digital Menu & Ordering
-                </span>
+            <div className="text-white text-center lg:text-left order-1 w-full">
+              {/* Logo */}
+              <div className="flex justify-center lg:justify-start mb-6 sm:mb-8">
+                <div className="relative w-[120px] h-[52px] sm:w-[140px] sm:h-[60px]">
+                  <Image
+                    src="/image/TapMenu_logo.png"
+                    alt="TapMenu Logo"
+                    fill
+                    className="object-contain"
+                    priority
+                  />
+                </div>
+              </div>
+
+              {/* Headline - Max 2 lines */}
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-5 md:mb-6 leading-tight">
+                <span className="block">Digital Menu</span>
+                <span className="block">Made Simple</span>
               </h1>
-              <p className="text-sm sm:text-base lg:text-lg text-gray-200 mb-5 sm:mb-5 md:mb-6 leading-relaxed max-w-2xl mx-auto lg:mx-0 mt-3 sm:mt-3 px-1 sm:px-0">
-                Let customers order from their table while you manage everything from one dashboard.
+
+              {/* Value Text */}
+              <p className="text-base sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-7 md:mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
+                One QR code. Instant ordering. Complete control from your dashboard.
               </p>
 
-              {/* CTA Buttons - Primary actions on mobile */}
-              <div className="flex flex-col gap-3 sm:flex-row sm:gap-3 justify-center lg:justify-start mb-0 sm:mb-5 md:mb-6">
+              {/* CTA Buttons - Stacked on mobile, side-by-side on desktop */}
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start mb-6 sm:mb-8">
                 <a
                   href="/owner/login"
-                  className="bg-[#22C55E] text-white px-8 sm:px-6 lg:px-8 py-4 rounded-full font-semibold text-base transition-all duration-200 hover:bg-[#16A34A] hover:shadow-lg text-center min-h-[52px] flex items-center justify-center shadow-lg"
+                  className="bg-[#22C55E] text-white px-8 py-4 rounded-full font-semibold text-base sm:text-lg transition-all duration-200 hover:bg-[#16A34A] hover:shadow-xl hover:scale-105 text-center min-h-[52px] flex items-center justify-center shadow-lg"
                 >
                   Get Started
                 </a>
-                <WhatsAppButton variant="inline" className="min-h-[52px]" />
+                <WhatsAppButton variant="inline" className="min-h-[52px] text-base sm:text-lg" />
               </div>
 
-              {/* Benefit Bullet Points - Show only 1 on mobile */}
-              <ul className="space-y-2 sm:space-y-2.5 max-w-xl mx-auto lg:mx-0 hidden sm:block md:block">
-                <li className="flex items-start gap-2 sm:gap-3">
-                  <svg
-                    className="w-4 h-4 sm:w-5 sm:h-5 text-[#22C55E] flex-shrink-0 mt-0.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  <span className="text-xs sm:text-sm lg:text-base text-gray-100">One QR code for the entire restaurant</span>
+              {/* Value Points - Max 3 on mobile, more on desktop */}
+              <ul className="space-y-3 sm:space-y-4 max-w-lg mx-auto lg:mx-0">
+                <li className="flex items-center gap-3 sm:gap-4">
+                  <div className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-[#22C55E] rounded-full flex items-center justify-center">
+                    <svg
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2.5}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </div>
+                  <span className="text-sm sm:text-base lg:text-lg text-gray-200">QR code ordering in seconds</span>
                 </li>
-                <li className="flex items-start gap-2 sm:gap-3">
-                  <svg
-                    className="w-4 h-4 sm:w-5 sm:h-5 text-[#22C55E] flex-shrink-0 mt-0.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  <span className="text-xs sm:text-sm lg:text-base text-gray-100">Faster ordering, fewer mistakes</span>
+                <li className="flex items-center gap-3 sm:gap-4">
+                  <div className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-[#22C55E] rounded-full flex items-center justify-center">
+                    <svg
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2.5}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </div>
+                  <span className="text-sm sm:text-base lg:text-lg text-gray-200">Real-time order tracking</span>
                 </li>
-                <li className="hidden md:flex items-start gap-2 sm:gap-3">
-                  <svg
-                    className="w-4 h-4 sm:w-5 sm:h-5 text-[#22C55E] flex-shrink-0 mt-0.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  <span className="text-xs sm:text-sm lg:text-base text-gray-100">Easy menu & stock updates</span>
-                </li>
-                <li className="hidden md:flex items-start gap-2 sm:gap-3">
-                  <svg
-                    className="w-4 h-4 sm:w-5 sm:h-5 text-[#22C55E] flex-shrink-0 mt-0.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  <span className="text-xs sm:text-sm lg:text-base text-gray-100">Live orders and sales analytics</span>
-                </li>
-                <li className="hidden lg:flex items-start gap-2 sm:gap-3">
-                  <svg
-                    className="w-4 h-4 sm:w-5 sm:h-5 text-[#22C55E] flex-shrink-0 mt-0.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  <span className="text-xs sm:text-sm lg:text-base text-gray-100">No app required for customers</span>
+                <li className="flex items-center gap-3 sm:gap-4">
+                  <div className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 bg-[#22C55E] rounded-full flex items-center justify-center">
+                    <svg
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2.5}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </div>
+                  <span className="text-sm sm:text-base lg:text-lg text-gray-200">Live analytics & insights</span>
                 </li>
               </ul>
             </div>
 
-            {/* Right Side - Mobile Mockup - Hidden on mobile, shown on md+ */}
-            <div className="flex justify-center lg:justify-end order-2 mb-4 lg:mb-0 hidden md:flex">
-              <div className="relative w-full max-w-[160px] sm:max-w-[200px] md:max-w-[240px] lg:max-w-[280px]">
+            {/* Right Side - Phone Mockup - Desktop Version (Hidden on mobile) */}
+            <div className="hidden lg:flex justify-center lg:justify-end order-2">
+              <div className="relative w-full max-w-[280px] xl:max-w-[320px]">
                 {/* Mobile Frame */}
-                <div className="relative bg-white rounded-[2rem] sm:rounded-[2.5rem] p-1.5 sm:p-2 shadow-2xl">
-                  <div className="bg-gray-900 rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden">
+                <div className="relative bg-white rounded-[2.5rem] p-2 shadow-2xl transform hover:scale-105 transition-transform duration-300">
+                  <div className="bg-gray-900 rounded-[2rem] overflow-hidden">
                     {/* Mobile Screen Content */}
                     <div className="aspect-[9/19] bg-gradient-to-br from-[#F8FAFC] to-white overflow-hidden relative">
-                      {/* TapMenu UI Image */}
                       <img
                         src="/image/TapMenu_UI-removebg-preview.png"
                         alt="TapMenu Mobile App Interface"
@@ -208,11 +189,31 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-                {/* Decorative Elements - Hidden on mobile */}
-                <div className="hidden lg:block absolute -bottom-3 -right-3 w-16 h-16 bg-[#22C55E] opacity-20 rounded-full blur-2xl"></div>
-                <div className="hidden lg:block absolute -top-3 -left-3 w-24 h-24 bg-[#22C55E] opacity-10 rounded-full blur-3xl"></div>
+                {/* Subtle Glow Effect */}
+                <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-[#22C55E] opacity-20 rounded-full blur-3xl"></div>
+                <div className="absolute -top-4 -left-4 w-40 h-40 bg-[#22C55E] opacity-10 rounded-full blur-3xl"></div>
               </div>
             </div>
+
+            {/* Phone Mockup - Mobile Version (Shown below content on mobile) */}
+            <div className="flex lg:hidden justify-center order-2 mt-4 sm:mt-6 w-full">
+              <div className="relative w-full max-w-[180px] sm:max-w-[220px]">
+                {/* Mobile Frame */}
+                <div className="relative bg-white rounded-[2rem] p-1.5 shadow-xl">
+                  <div className="bg-gray-900 rounded-[1.5rem] overflow-hidden">
+                    {/* Mobile Screen Content */}
+                    <div className="aspect-[9/19] bg-gradient-to-br from-[#F8FAFC] to-white overflow-hidden relative">
+                      <img
+                        src="/image/TapMenu_UI-removebg-preview.png"
+                        alt="TapMenu Mobile App Interface"
+                        className="absolute inset-0 w-full h-full object-cover object-center"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </header>
