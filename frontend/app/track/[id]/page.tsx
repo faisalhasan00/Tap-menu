@@ -97,22 +97,29 @@ function TrackOrderContent() {
   const orderId = params?.id as string;
 
   // ============================================
-  // STEP 3 & 4: TRACK ORDER PAGE LOGIC
+  // PART 1: FIX BLINKING ISSUE
   // ============================================
+  // PROBLEM: Having 'order' in dependency array causes infinite loop
+  // SOLUTION: Only depend on 'orderId', separate interval logic
+  
+  // Effect 1: Fetch order when trackingId changes
   useEffect(() => {
     console.log('🔄 [TRACK_PAGE] Component mounted/updated');
     console.log('🔄 [TRACK_PAGE] Route params:', params);
     console.log('🔄 [TRACK_PAGE] Tracking ID from params (raw):', orderId);
     
+    // ============================================
+    // RULE: NO auto-navigation, just render error
+    // ============================================
     if (!orderId) {
       console.error('❌ [TRACK_PAGE] No tracking ID in route params');
       setError('Invalid tracking ID or order number');
       setLoading(false);
+      setOrder(null);
       return;
     }
 
     // Next.js automatically decodes route parameters
-    // orderId is already decoded, use it directly
     console.log('🔄 [TRACK_PAGE] Tracking identifier (ready for API):', orderId);
 
     const fetchOrder = async () => {
@@ -152,6 +159,7 @@ function TrackOrderContent() {
         });
         setError(err.message || 'Order not found. Please check your tracking number or order ID.');
         setOrder(null);
+        setTimeRemaining(null);
       } finally {
         setLoading(false);
         console.log('🏁 [TRACK_PAGE] Fetch completed');
@@ -159,21 +167,37 @@ function TrackOrderContent() {
     };
 
     fetchOrder();
+    
+    // ============================================
+    // CRITICAL: Only depend on orderId, NOT order
+    // This prevents infinite re-render loop
+    // ============================================
+  }, [orderId, params]);
 
-    // Update time remaining every minute
-    const interval = setInterval(() => {
-      if (order && order.status !== 'READY' && order.status !== 'REJECTED') {
-        const orderDate = new Date(order.createdAt);
-        const estimatedMinutes = order.estimatedTime || 15;
-        const estimatedCompletion = new Date(orderDate.getTime() + estimatedMinutes * 60000);
-        const now = new Date();
-        const remaining = Math.max(0, Math.ceil((estimatedCompletion.getTime() - now.getTime()) / 60000));
-        setTimeRemaining(remaining);
-      }
-    }, 60000); // Update every minute
+  // Effect 2: Update time remaining every minute (separate from fetch)
+  useEffect(() => {
+    if (!order || order.status === 'READY' || order.status === 'REJECTED') {
+      setTimeRemaining(null);
+      return;
+    }
+
+    // Calculate initial time remaining
+    const calculateTimeRemaining = () => {
+      const orderDate = new Date(order.createdAt);
+      const estimatedMinutes = order.estimatedTime || 15;
+      const estimatedCompletion = new Date(orderDate.getTime() + estimatedMinutes * 60000);
+      const now = new Date();
+      const remaining = Math.max(0, Math.ceil((estimatedCompletion.getTime() - now.getTime()) / 60000));
+      setTimeRemaining(remaining);
+    };
+
+    calculateTimeRemaining();
+
+    // Update every minute
+    const interval = setInterval(calculateTimeRemaining, 60000);
 
     return () => clearInterval(interval);
-  }, [orderId, order]);
+  }, [order]);
 
   const restaurantName = order?.restaurantId && typeof order.restaurantId === 'object' 
     ? order.restaurantId.name 
@@ -230,6 +254,46 @@ function TrackOrderContent() {
     }
   };
 
+  // ============================================
+  // PART 2: STABLE RENDER LOGIC (NON-NEGOTIABLE)
+  // ============================================
+  // Render order MUST be:
+  // a) Missing trackingId → friendly message (NO redirect)
+  // b) Loading → stable loading UI (NO redirect)
+  // c) Error → error message
+  // d) Success → tracking UI
+
+  // a) If trackingId is missing: render friendly message
+  if (!orderId) {
+    return (
+      <PublicLayout>
+        <div className="min-h-screen bg-[#F8FAFC] py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+              <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-10 h-10 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h1 className="text-2xl font-bold text-[#0F172A] mb-3">Tracking ID Required</h1>
+              <p className="text-gray-600 mb-6">
+                Please provide a tracking ID or order number to view your order status.
+              </p>
+              <Button
+                onClick={() => router.push('/track')}
+                variant="primary"
+                className="w-full sm:w-auto"
+              >
+                Enter Tracking ID
+              </Button>
+            </div>
+          </div>
+        </div>
+      </PublicLayout>
+    );
+  }
+
+  // b) If loading: render stable loading UI
   if (loading) {
     return (
       <PublicLayout>
