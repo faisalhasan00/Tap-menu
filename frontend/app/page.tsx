@@ -94,12 +94,6 @@ export default function Home() {
                 >
                   Get Started
                 </a>
-                <a
-                  href="/contact"
-                  className="border-2 border-white text-white px-5 sm:px-6 lg:px-8 py-3 sm:py-3 rounded-full font-semibold text-sm sm:text-base transition-all duration-200 hover:bg-white hover:text-[#0F172A] text-center min-h-[44px] flex items-center justify-center"
-                >
-                  Book Free Demo
-                </a>
                 <WhatsAppButton variant="inline" />
                 <a
                   href="/track-order"
