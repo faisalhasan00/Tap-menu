@@ -111,19 +111,41 @@ class OrderService {
   }
 
   async getOrderByTrackingId(trackingId: string): Promise<{ success: boolean; data: Order }> {
-    const response = await fetch(apiRoutes.orders.track(trackingId), {
+    // ============================================
+    // STEP 5: BACKEND VERIFICATION
+    // ============================================
+    // Backend endpoint: GET /api/orders/track/:trackingId
+    // Backend accepts both trackingNumber (DM-ORD-XXXXXX) and trackingId (TM-XXXX)
+    // It tries trackingNumber first, then falls back to trackingId
+    
+    const url = apiRoutes.orders.track(trackingId);
+    console.log('📡 [ORDER_SERVICE] Fetching order from:', url);
+    console.log('📡 [ORDER_SERVICE] Tracking identifier:', trackingId);
+    
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
+    console.log('📥 [ORDER_SERVICE] Response status:', response.status);
+
     if (!response.ok) {
       const error = await response.json();
+      console.error('❌ [ORDER_SERVICE] Error response:', error);
       throw new Error(error.message || 'Order not found');
     }
 
-    return response.json();
+    const result = await response.json();
+    console.log('✅ [ORDER_SERVICE] Order fetched successfully:', {
+      orderId: result.data?._id,
+      trackingNumber: result.data?.trackingNumber,
+      trackingId: result.data?.trackingId,
+      status: result.data?.status
+    });
+    
+    return result;
   }
 }
 

@@ -32,7 +32,22 @@ const OrderSuccessScreen: React.FC<OrderSuccessScreenProps> = ({
   onClose,
 }) => {
   const router = useRouter();
+  
+  // ============================================
+  // STEP 1: VERIFY TRACKING IDENTIFIER
+  // ============================================
+  // Use trackingNumber (DM-ORD-XXXXXX) as primary identifier
+  // Fallback to trackingId (TM-XXXX) for backward compatibility
+  // Backend supports both, but trackingNumber is preferred
   const displayTrackingNumber = trackingNumber || trackingId;
+  const trackingIdentifier = trackingNumber || trackingId; // Use this for navigation
+
+  console.log('🔍 [ORDER_SUCCESS] Tracking identifiers:', {
+    trackingNumber,
+    trackingId,
+    displayTrackingNumber,
+    trackingIdentifier
+  });
 
   const formatEstimatedTime = (minutes: number): string => {
     if (minutes < 60) {
@@ -46,9 +61,31 @@ const OrderSuccessScreen: React.FC<OrderSuccessScreenProps> = ({
     return `${hours} hour${hours !== 1 ? 's' : ''} ${remainingMinutes} minute${remainingMinutes !== 1 ? 's' : ''}`;
   };
 
+  // ============================================
+  // STEP 2: FIX BUTTON HANDLER
+  // ============================================
   const handleTrackOrder = () => {
-    if (displayTrackingNumber) {
-      router.push(frontendRoutes.customer.track(displayTrackingNumber));
+    console.log('🔘 [ORDER_SUCCESS] Track Order button clicked');
+    console.log('🔘 [ORDER_SUCCESS] Tracking identifier:', trackingIdentifier);
+    
+    if (!trackingIdentifier) {
+      console.error('❌ [ORDER_SUCCESS] No tracking identifier available');
+      alert('Tracking information is not available. Please contact support.');
+      return;
+    }
+
+    // Build the tracking URL
+    // Next.js router.push() handles URL encoding automatically
+    const trackUrl = frontendRoutes.customer.track(trackingIdentifier);
+    console.log('🔘 [ORDER_SUCCESS] Navigating to:', trackUrl);
+    console.log('🔘 [ORDER_SUCCESS] Tracking identifier:', trackingIdentifier);
+    
+    try {
+      router.push(trackUrl);
+      console.log('✅ [ORDER_SUCCESS] Navigation initiated');
+    } catch (error) {
+      console.error('❌ [ORDER_SUCCESS] Navigation error:', error);
+      alert('Failed to navigate to tracking page. Please try again.');
     }
   };
 

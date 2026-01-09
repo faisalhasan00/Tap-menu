@@ -96,18 +96,40 @@ function TrackOrderContent() {
 
   const orderId = params?.id as string;
 
+  // ============================================
+  // STEP 3 & 4: TRACK ORDER PAGE LOGIC
+  // ============================================
   useEffect(() => {
+    console.log('🔄 [TRACK_PAGE] Component mounted/updated');
+    console.log('🔄 [TRACK_PAGE] Route params:', params);
+    console.log('🔄 [TRACK_PAGE] Tracking ID from params (raw):', orderId);
+    
     if (!orderId) {
+      console.error('❌ [TRACK_PAGE] No tracking ID in route params');
       setError('Invalid tracking ID or order number');
       setLoading(false);
       return;
     }
 
+    // Next.js automatically decodes route parameters
+    // orderId is already decoded, use it directly
+    console.log('🔄 [TRACK_PAGE] Tracking identifier (ready for API):', orderId);
+
     const fetchOrder = async () => {
       try {
+        console.log('📡 [TRACK_PAGE] Fetching order with identifier:', orderId);
         setLoading(true);
         setError('');
+        
+        // Use orderId directly (Next.js already decoded it)
         const response = await orderService.getOrderByTrackingId(orderId);
+        console.log('✅ [TRACK_PAGE] Order fetched successfully:', {
+          orderId: response.data._id,
+          trackingNumber: response.data.trackingNumber,
+          trackingId: response.data.trackingId,
+          status: response.data.status
+        });
+        
         setOrder(response.data);
         
         // Calculate time remaining if order is not ready/rejected
@@ -122,11 +144,17 @@ function TrackOrderContent() {
           setTimeRemaining(null);
         }
       } catch (err: any) {
-        console.error('Error fetching order:', err);
+        console.error('❌ [TRACK_PAGE] Error fetching order:', err);
+        console.error('❌ [TRACK_PAGE] Error details:', {
+          message: err.message,
+          trackingId: orderId,
+          error: err
+        });
         setError(err.message || 'Order not found. Please check your tracking number or order ID.');
         setOrder(null);
       } finally {
         setLoading(false);
+        console.log('🏁 [TRACK_PAGE] Fetch completed');
       }
     };
 
